@@ -8,7 +8,7 @@ do
   do
     echo "==================="
     echo "Start ${year} ${node}"
-    ext='FL'
+    ext='FL_pt100'
     procs='GluGluToHHTo2G2l2nu'
     
     InputTreeCats='HHWWggTag_2' #input cat name in the Signal tree
@@ -28,11 +28,12 @@ else
     SignalTreeFile="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/2016/Signal/FL_NLO_2016_hadded/GluGluToHHTo2G2l2nu_node_${node}_2016.root"
     DataTreeFile="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/2016/Data_Trees/Data_2016.root"
 fi
-    InputWorkspace="/eos/user/c/chuw/HHWWggWorkspace/FL_withPt_over_Mass_dipho_pt97/" 
+    # InputWorkspace="/eos/user/c/chuw/HHWWggWorkspace/FL_withPt_over_Mass_dipho_pt91_for_PAS/"
+    InputWorkspace="/eos/user/c/chuw/HHWWggWorkspace/FL_withPt_over_Mass_dipho_pt100/" 
 
     Replace='HHWWggTag_FL_0'
     doSelections="1"
-    Selections='((Leading_Photon_pt/CMS_hgg_mass) > 1/3. \&\& (Subleading_Photon_pt/CMS_hgg_mass) > 1/4. ) \&\& dipho_pt > 97' # Seletions you want to applied.
+    Selections='((Leading_Photon_pt/CMS_hgg_mass) > 1/3. \&\& (Subleading_Photon_pt/CMS_hgg_mass) > 1/4. ) \&\& dipho_pt > 100' # Seletions you want to applied.
     catNames=(${cat//,/ })
     eval `scramv1 runtime -sh`
     source ./setup.sh
@@ -82,8 +83,8 @@ else
   sed -i "s#SELECTIONS##g" DataSelections_Run.C #No Selection
 fi
 
-root -b -q  Selections_Run.C
-root -b -q DataSelections_Run.C
+# root -b -q  Selections_Run.C
+# root -b -q DataSelections_Run.C
 rm Selections_Run.C
 rm DataSelections_Run.C
 mv ${procs}_node_${node}_${year}.root  ../Trees2WS/
@@ -108,9 +109,9 @@ fi
 sed -i "s#2017#${year}#g" HHWWgg_config_run.py
 sed -i "s#auto#${cat}#g" HHWWgg_config_run.py
 rm -rf ws*
-python trees2ws.py --inputConfig HHWWgg_config_run.py --inputTreeFile ./${procs}_node_${node}_${year}.root --inputMass node_${node} --productionMode ${procs}  --year ${year} --doSystematics
+# python trees2ws.py --inputConfig HHWWgg_config_run.py --inputTreeFile ./${procs}_node_${node}_${year}.root --inputMass node_${node} --productionMode ${procs}  --year ${year} --doSystematics
 # data tree to data ws
-python trees2ws_data.py --inputConfig HHWWgg_config_run.py --inputTreeFile ./Data_13TeV_${year}.root
+# python trees2ws_data.py --inputConfig HHWWgg_config_run.py --inputTreeFile ./Data_13TeV_${year}.root
 rm HHWWgg_config_run.py
 for catName in ${catNames[@]}
 do
@@ -154,7 +155,7 @@ python RunSignalScripts.py --inputConfig HHWWgg_config_Run.py --mode signalFit -
 for catName in ${catNames[@]}
 do
 cp outdir_${ext}_${year}_node_${node}/signalFit/output/CMS-HGG_sigfit_${ext}_${year}_node_${node}_${procs}_${year}_${catName}.root outdir_${ext}_${year}_node_${node}/CMS-HGG_sigfit_${ext}_${year}_node_${node}_${catName}.root
-python RunPlotter.py --procs all --years $year --cats $catName --ext ${ext}_${year}_node_${node} --HHWWggLabel $ext
+# python RunPlotter.py --procs all --years $year --cats $catName --ext ${ext}_${year}_node_${node} --HHWWggLabel $ext
 done
 
 rm HHWWgg_config_Run.py
@@ -173,7 +174,7 @@ cmsenv
 # make clean
 make
 
-python RunBackgroundScripts.py --inputConfig HHWWgg_cofig_Run.py --mode fTestParallel
+# python RunBackgroundScripts.py --inputConfig HHWWgg_cofig_Run.py --mode fTestParallel
 
 rm HHWWgg_cofig_Run.py
 ########################################
@@ -195,9 +196,9 @@ fi
 #
 #   Add singleHiggs procs to RunYields.py 
 ###################
-python RunYields.py --cats ${cat} --inputWSDirMap ${year}=${InputWorkspace}/Signal/Input/${year} --procs ${procs},${singleHiggs} --doSystematics True --doHHWWgg True --HHWWggLabel node_${node} --batch local --ext SingleHiggs  --bkgModelWSDir ./Models --sigModelWSDir ./Models 
-python makeDatacard.py --years ${year} --prune True --ext SingleHiggs  --doSystematics True --pruneThreshold 0.000001
-python cleanDatacard.py --datacard Datacard.txt --factor 2 --removeDoubleSided
+# python RunYields.py --cats ${cat} --inputWSDirMap ${year}=${InputWorkspace}/Signal/Input/${year} --procs ${procs},${singleHiggs} --doSystematics True --doHHWWgg True --HHWWggLabel node_${node} --batch local --ext SingleHiggs  --bkgModelWSDir ./Models --sigModelWSDir ./Models
+# python makeDatacard.py --years ${year} --prune True --ext SingleHiggs  --doSystematics True --pruneThreshold 0.000001
+# python cleanDatacard.py --datacard Datacard.txt --factor 2 --removeDoubleSided
 mv ./SingleHiggs_${procs}_node_${node}_${year}/*.root SingleHiggs_${procs}_node_${node}_${year}/Models/
 for catName in ${catNames[@]}
 do
@@ -206,16 +207,16 @@ cp ${path}/Signal/outdir_${ext}_${year}_node_${node}/signalFit/output/CMS-HGG_si
 done
 cp Datacard_cleaned.txt ./SingleHiggs_${procs}_node_${node}_${year}/HHWWgg_${procs}_node_${node}_${ext}_${year}.txt
 
-python RunYields.py --cats $cat --inputWSDirMap $year=${InputWorkspace}/Signal/Input/${year}/ --procs ${procs} --doHHWWgg True --HHWWggLabel node_${node} --batch local --sigModelWSDir ./Models --bkgModelWSDir ./Models --doSystematics True --ext ${procs}_node_${node} 
-python makeDatacard.py --years $year --prune True --ext ${procs}_node_${node} --pruneThreshold 0.00001 --doSystematics
-python cleanDatacard.py --datacard Datacard.txt --factor 2 --removeDoubleSided
+# python RunYields.py --cats $cat --inputWSDirMap $year=${InputWorkspace}/Signal/Input/${year}/ --procs ${procs} --doHHWWgg True --HHWWggLabel node_${node} --batch local --sigModelWSDir ./Models --bkgModelWSDir ./Models --doSystematics True --ext ${procs}_node_${node}
+# python makeDatacard.py --years $year --prune True --ext ${procs}_node_${node} --pruneThreshold 0.00001 --doSystematics
+# python cleanDatacard.py --datacard Datacard.txt --factor 2 --removeDoubleSided
 cp Datacard_cleaned.txt ./SingleHiggs_${procs}_node_${node}_${year}/HHWWgg_${procs}_node_${node}_${ext}_${year}_no_singleH.txt
 datacards=`ls ./SingleHiggs_${procs}_node_${node}_${year}/*.txt`
 for datacard in $datacards
 do
 echo "xs_HH         rateParam * GluGluToHHTo2G2l2nu_*_hwwhgg_node_${node} 31.049" >>$datacard
 echo "br_HH_WWgg    rateParam * GluGluToHHTo2G2l2nu_*_hwwhgg_node_${node} 0.000970198" >>$datacard
-echo "br_WW_2l2nu   rateParam * GluGluToHHTo2G2l2nu_*_hwwhgg_node_${node} 0.1071" >>$datacard
+echo "br_WW_2l2nu   rateParam * GluGluToHHTo2G2l2nu_*_hwwhgg_node_${node} 0.1046" >>$datacard
 echo "nuisance edit  freeze xs_HH" >> $datacard
 echo "nuisance edit  freeze br_WW_2l2nu" >>  $datacard
 echo "nuisance edit  freeze br_HH_WWgg" >> $datacard

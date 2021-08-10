@@ -1,4 +1,4 @@
-print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG SIGNAL FITTER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+
 import ROOT
 import pandas as pd
 import pickle
@@ -54,7 +54,7 @@ def get_options():
   parser.add_option("--scalesGlobal", dest='scalesGlobal', default='', help='Photon shape systematics: scalesGlobal')
   parser.add_option("--smears", dest='smears', default='', help='Photon shape systematics: smears')
   # Parameter values
-  parser.add_option('--replacementThreshold', dest='replacementThreshold', default=-1, type='int', help="Nevent threshold to trigger replacement dataset")
+  parser.add_option('--replacementThreshold', dest='replacementThreshold', default=100, type='int', help="Nevent threshold to trigger replacement dataset")
   parser.add_option('--beamspotWidthData', dest='beamspotWidthData', default=3.4, type='float', help="Width of beamspot in data [cm]")
   parser.add_option('--beamspotWidthMC', dest='beamspotWidthMC', default=5.14, type='float', help="Width of beamspot in MC [cm]")
   parser.add_option('--MHPolyOrder', dest='MHPolyOrder', default=1, type='int', help="Order of polynomial for MH dependence")
@@ -188,6 +188,7 @@ if( datasetRVForFit[MHNominal].numEntries() < opt.replacementThreshold  )|( data
     if ( opt.analysis == 'HHWWgg' ):
         WSFileName = glob.glob("%s/Shifted*M%s*%s_%s_%s.root"%(opt.inputWSDir,mp,procReplacementFit,opt.HHWWggLabel,opt.cat))[0]
     elif ( "single_Higgs" in opt.HHWWggLabel ):
+        print "%s/Shifted*M%s*%s_%s.root"%(opt.inputWSDir,mp,procReplacementFit,opt.cat)
         WSFileName = glob.glob("%s/Shifted*M%s*%s_%s.root"%(opt.inputWSDir,mp,procReplacementFit,opt.cat))[0]
     else:
         WSFileName = glob.glob("%s/output*M%s*%s.root"%(opt.inputWSDir,mp,procReplacementFit))[0]

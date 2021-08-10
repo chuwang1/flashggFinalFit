@@ -115,7 +115,7 @@ if opt.year == '2018': systematics.append("JetHEM")
 # UPROOT file
 f = uproot.open(opt.inputTreeFile)
 print inputTreeDir
-if inputTreeDir == '': listOfTreeNames == f.keys()
+if inputTreeDir == '': listOfTreeNames = f.keys()
 else: listOfTreeNames = f[inputTreeDir].keys()
 # If cats = 'auto' then determine from list of trees
 if cats == 'auto':
@@ -241,7 +241,8 @@ for stxsId in data[stxsVar].unique():
     elif opt.productionMode == 'thw': stxsBin = re.sub("TH","THW",stxsBin)
 
     # Define output workspace file
-    outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%stxsBin
+    #  outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%stxsBin
+    outputWSDir = "./"+"ws_%s"%opt.productionMode
     if not os.path.exists(outputWSDir): os.system("mkdir %s"%outputWSDir)
     outputWSFile = outputWSDir+"/"+re.sub(".root","_%s.root"%stxsBin,opt.inputTreeFile.split("/")[-1])
     print " --> Creating output workspace for STXS bin: %s (%s)"%(stxsBin,outputWSFile)
@@ -252,7 +253,8 @@ for stxsId in data[stxsVar].unique():
     if opt.doSystematics: sdf = sdata
 
     # Define output workspace file
-    outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%opt.productionMode
+    #  outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%opt.productionMode
+    outputWSDir = "./"+"ws_%s"%opt.productionMode
     #  outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%dataToProc(opt.productionMode)
     if not os.path.exists(outputWSDir): os.system("mkdir %s"%outputWSDir)
     #  outputWSFile = outputWSDir+"/"+re.sub(".root","_%s.root"%dataToProc(opt.productionMode),opt.inputTreeFile.split("/")[-1])
@@ -263,6 +265,7 @@ for stxsId in data[stxsVar].unique():
   fout = ROOT.TFile(outputWSFile,"RECREATE")
   foutdir = fout.mkdir(inputWSName__.split("/")[0])
   foutdir.cd()
+  print "WS:",inputWSName__.split("/")[1]
   ws = ROOT.RooWorkspace(inputWSName__.split("/")[1],inputWSName__.split("/")[1])
   
   # Add variables to workspace
@@ -278,7 +281,8 @@ for stxsId in data[stxsVar].unique():
     t = array2tree(sa)
 
     # Define RooDataSet
-    dName = "%s_%s_%s_%s"%(opt.productionMode,opt.inputMass,sqrts__,cat)
+    newcat=cat.replace("SL_","SLDNN_")
+    dName = "%s_%s_%s_%s"%(opt.productionMode,opt.inputMass,sqrts__,newcat)
     
     # Make argset
     aset = make_argset(ws,varNames)
@@ -304,7 +308,8 @@ for stxsId in data[stxsVar].unique():
           t = array2tree(sa)
           
           # Define RooDataHist
-          hName = "%s_%s_%s_%s_%s%s01sigma"%(opt.productionMode,opt.inputMass,sqrts__,cat,s,direction)
+          newcat=cat.replace("SL_","SLDNN_")
+          hName = "%s_%s_%s_%s_%s%s01sigma"%(opt.productionMode,opt.inputMass,sqrts__,newcat,s,direction)
 
           # Make argset 
           systematicsVarsDropWeight = []

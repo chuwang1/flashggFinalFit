@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-nodes=("cHHH5")
+nodes=("cHHH1")
 years=("2017" "2018" "2016")
 singleHiggs="tth,wzh,vbf,ggh"
 for node in ${nodes[@]}
@@ -16,12 +16,15 @@ do
     
     cat='HHWWggTag_SLDNN_0,HHWWggTag_SLDNN_1,HHWWggTag_SLDNN_2,HHWWggTag_SLDNN_3' #Final cat name 
     
-    # SignalTreeFile="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/2016/SL_DNN_Categorized_LOSignals_noPtOverM-Training/Signal_${node}_2016_all_CategorizedTrees.root"
-    SignalTreeFile="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/${year}/HHWWyyDNN_WithHggFactor2-200Epochs-3ClassMulticlass_EvenSingleH_2Hgg_withKinWeightCut10_BalanceYields/Signal_${node}_${year}_all_CategorizedTrees.root"
-    DataTreeFile="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/${year}/HHWWyyDNN_WithHggFactor2-200Epochs-3ClassMulticlass_EvenSingleH_2Hgg_withKinWeightCut10_BalanceYields/Data_${year}_CategorizedTrees.root"
-    InputWorkspace="/eos/user/c/chuw/HHWWggWorkspace/SL_multiClass/" 
+    # SignalTreeFile="/eos/user/c/chuw/SLDNN_ntuples/Signal_${node}_${year}_all_CategorizedTrees.root"
+    # SignalTreeFile="/eos/user/c/chuw/SLDNN_ntuples/Signal_${node}_${year}_all_CategorizedTrees.root"
+    SignalTreeFile="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/${year}/HHWWyyDNN_MultiClass_2Hgg_HggClassWeightFactor2_BalanceYields/Signal_${node}_${year}_all_CategorizedTrees.root"
 
-    Replace='HHWWggTag_SLDNN_0'
+    # DataTreeFile="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/${year}/HHWWyyDNN_WithHggFactor2-200Epochs-3ClassMulticlass_EvenSingleH_2Hgg_withKinWeightCut10_BalanceYields/Data_${year}_CategorizedTrees.root"
+    DataTreeFile="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/${year}/HHWWyyDNN_MultiClass_2Hgg_HggClassWeightFactor2_BalanceYields/Data_${year}_CategorizedTrees.root "
+    InputWorkspace="/eos/user/c/chuw/HHWWggWorkspace/SL_multiClass_applied_singleH_SFs_2021_06_09/" 
+
+    Replace='HHWWggTag_SLDNN_3'
     doSelections="0"
     Selections='dipho_pt > 91' # Seletions you want to applied.
     catNames=(${cat//,/ })
@@ -73,8 +76,8 @@ else
   sed -i "s#SELECTIONS##g" DataSelections_Run.C #No Selection
 fi
 
-root -b -q  Selections_Run.C
-root -b -q DataSelections_Run.C
+# root -b -q  Selections_Run.C
+# root -b -q DataSelections_Run.C
 rm Selections_Run.C
 rm DataSelections_Run.C
 mv ${procs}_node_${node}_${year}.root  ../Trees2WS/
@@ -92,25 +95,30 @@ fi
 if [ $year -eq "2018" ] 
 then
   echo "2018, remove prefire"
-  cp HHWWgg_config_noprefire.py HHWWgg_config_run.py
+  cp HHWWgg_config_noprefire_LO.py HHWWgg_config_run.py
 else
-  cp HHWWgg_config.py HHWWgg_config_run.py
+  cp HHWWgg_config_LO.py HHWWgg_config_run.py
 fi
 sed -i "s#2017#${year}#g" HHWWgg_config_run.py
-sed -i "s#auto#${cat}#g" HHWWgg_config_run.py
+sed -i "s#auto#${InputTreeCats}#g" HHWWgg_config_run.py
+sed -i "s#tagsDumper/trees##g" HHWWgg_config_run.py
 rm -rf ws*
-python trees2ws.py --inputConfig HHWWgg_config_run.py --inputTreeFile ./${procs}_node_${node}_${year}.root --inputMass node_${node} --productionMode ${procs}  --year ${year} --doSystematics
+echo "python trees2ws.py --inputConfig HHWWgg_config_run.py --inputTreeFile --inputTreeFile $SignalTreeFile --inputMass node_${node} --productionMode ${procs}  --year ${year} --doSystematics "
+python trees2ws.py --inputConfig HHWWgg_config_run.py --inputTreeFile $SignalTreeFile --inputMass node_${node} --productionMode ${procs}  --year ${year} --doSystematics 
 # data tree to data ws
-python trees2ws_data.py --inputConfig HHWWgg_config_run.py --inputTreeFile ./Data_13TeV_${year}.root
+python trees2ws_data.py --inputConfig HHWWgg_config_run.py --inputTreeFile $DataTreeFile --outputWSDir ./
 rm HHWWgg_config_run.py
 for catName in ${catNames[@]}
 do
   if [ ! -d "${InputWorkspace}/Background/Input/${procs}_${year}" ]; then
     mkdir -p ${InputWorkspace}/Background/Input/${procs}_${year}
   fi
-  cp ws_${procs}/${procs}_node_${node}_${year}_${procs}.root ${InputWorkspace}/Signal/Input/${year}/Shifted_M125_${procs}_node_${node}_${catName}.root
+    cp ws_${procs}/*.root ${InputWorkspace}/Signal/Input/${year}/Shifted_M125_${procs}_node_${node}_${catName}.root
   cp ${InputWorkspace}/Signal/Input/${year}/Shifted_M125_${procs}_node_${node}_${catName}.root ${InputWorkspace}/Signal/Input/${year}/output_M125_${procs}_node_${node}_${catName}.root
-  cp ws/Data_13TeV_${year}.root ${InputWorkspace}/Background/Input/${procs}_${year}/allData.root
+  cp ws/*.root ${InputWorkspace}/Background/Input/${procs}_${year}/allData.root
+  # cp ws_${procs}/${procs}_node_${node}_${year}_${procs}.root ${InputWorkspace}/Signal/Input/${year}/Shifted_M125_${procs}_node_${node}_${catName}.root
+  # cp ${InputWorkspace}/Signal/Input/${year}/Shifted_M125_${procs}_node_${node}_${catName}.root ${InputWorkspace}/Signal/Input/${year}/output_M125_${procs}_node_${node}_${catName}.root
+  # cp ws/Data_13TeV_${year}.root ${InputWorkspace}/Background/Input/${procs}_${year}/allData.root
 done
 rm ${procs}_node_${node}_${year}.root
 rm Data_13TeV_${year}.root
@@ -163,7 +171,7 @@ cmsenv
 # make clean
 make
 
-python RunBackgroundScripts.py --inputConfig HHWWgg_cofig_Run.py --mode fTestParallel
+# python RunBackgroundScripts.py --inputConfig HHWWgg_cofig_Run.py --mode fTestParallel
 
 rm HHWWgg_cofig_Run.py
 ########################################
@@ -185,9 +193,9 @@ fi
 #
 #   Add singleHiggs procs to RunYields.py 
 ###################
-python RunYields.py --cats ${cat} --inputWSDirMap ${year}=${InputWorkspace}/Signal/Input/${year} --procs ${procs},${singleHiggs} --doSystematics True --doHHWWgg True --HHWWggLabel node_${node} --batch local --ext SingleHiggs  --bkgModelWSDir ./Models --sigModelWSDir ./Models --skipZeroes True 
-python makeDatacard.py --years ${year} --prune True --ext SingleHiggs  --doSystematics True --pruneThreshold 0.000001
-python cleanDatacard.py --datacard Datacard.txt --factor 2 --removeDoubleSided
+# python RunYields.py --cats ${cat} --inputWSDirMap ${year}=${InputWorkspace}/Signal/Input/${year} --procs ${procs},${singleHiggs} --doSystematics True --doHHWWgg True --HHWWggLabel node_${node} --batch local --ext SingleHiggs  --bkgModelWSDir ./Models --sigModelWSDir ./Models --skipZeroes True
+# python makeDatacard.py --years ${year} --prune True --ext SingleHiggs  --doSystematics True --pruneThreshold 0.000001
+# python cleanDatacard.py --datacard Datacard.txt --factor 2 --removeDoubleSided
 mv ./SingleHiggs_${procs}_node_${node}_${year}/*.root SingleHiggs_${procs}_node_${node}_${year}/Models/
 for catName in ${catNames[@]}
 do
@@ -196,9 +204,9 @@ cp ${path}/Signal/outdir_${ext}_${year}_node_${node}/signalFit/output/CMS-HGG_si
 done
 cp Datacard_cleaned.txt ./SingleHiggs_${procs}_node_${node}_${year}/HHWWgg_${procs}_node_${node}_${ext}_${year}.txt
 
-python RunYields.py --cats $cat --inputWSDirMap $year=${InputWorkspace}/Signal/Input/${year}/ --procs ${procs} --doHHWWgg True --HHWWggLabel node_${node} --batch local --sigModelWSDir ./Models --bkgModelWSDir ./Models --doSystematics True --ext ${procs}_node_${node} 
-python makeDatacard.py --years $year --prune True --ext ${procs}_node_${node} --pruneThreshold 0.00001 --doSystematics
-python cleanDatacard.py --datacard Datacard.txt --factor 2 --removeDoubleSided
+# python RunYields.py --cats $cat --inputWSDirMap $year=${InputWorkspace}/Signal/Input/${year}/ --procs ${procs} --doHHWWgg True --HHWWggLabel node_${node} --batch local --sigModelWSDir ./Models --bkgModelWSDir ./Models --doSystematics True --ext ${procs}_node_${node}
+# python makeDatacard.py --years $year --prune True --ext ${procs}_node_${node} --pruneThreshold 0.00001 --doSystematics
+# python cleanDatacard.py --datacard Datacard.txt --factor 2 --removeDoubleSided
 cp Datacard_cleaned.txt ./SingleHiggs_${procs}_node_${node}_${year}/HHWWgg_${procs}_node_${node}_${ext}_${year}_no_singleH.txt
 datacards=`ls ./SingleHiggs_${procs}_node_${node}_${year}/*.txt`
 for datacard in $datacards
@@ -213,10 +221,10 @@ done
 
 cd ./SingleHiggs_${procs}_node_${node}_${year}
 echo "Combine results without singleH:"
-combine HHWWgg_${procs}_node_${node}_${ext}_${year}_no_singleH.txt  -m 125.38 -M AsymptoticLimits --run=blind  --freezeParameters MH
+# combine HHWWgg_${procs}_node_${node}_${ext}_${year}_no_singleH.txt  -m 125.38 -M AsymptoticLimits --run=blind  --freezeParameters MH
  
 echo "Combine results singleH:"
-combine HHWWgg_${procs}_node_${node}_${ext}_${year}.txt  -m 125.38 -M AsymptoticLimits --run=blind  --freezeParameters MH
+# combine HHWWgg_${procs}_node_${node}_${ext}_${year}.txt  -m 125.38 -M AsymptoticLimits --run=blind  --freezeParameters MH
 cd $path
 done
 done

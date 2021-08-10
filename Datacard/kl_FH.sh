@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 eval `scramv1 runtime -sh`
 source ../setup.sh
-InputWorkspace="/eos/user/l/lipe/HHWWggWorkspace/FH"
+InputWorkspace="/eos/user/c/chuw/HHWWggWorkspace/FH_DNN/"
 procs="GluGluToHHTo2G4Q,GluGluToHHTo2G2ZTo2G4Q"
 dir="FH_kl_combine"
 mkdir -p ${dir}/${dir}
-cats="HHWWggTag_FH_0"
+cats="HHWWggTag_FHDNN_0,HHWWggTag_FHDNN_2,HHWWggTag_FHDNN_3,HHWWggTag_FHDNN_1"
 singleH="tth,wzh,vbf,ggh"
 nodes="1,5,2p45"
 years="2016,2017,2018"
@@ -15,19 +15,26 @@ yearNames=(${years//,/ })
 procNames=(${procs//,/ })
 for proc in ${procNames[@]} 
 do
+  if [[ "$proc" = "GluGluToHHTo2G4Q" ]]
+  then
+    echo "WWgg channel"
+    ext="FH_without_signleH_training_WWgg"
+  else
+    ext="FH_without_signleH_training_ZZgg"
+  fi
 for year in ${yearNames[@]}
 do
 for cat in ${catNames[@]}
 do  
   for node in ${nodeNames[@]}
   do
-cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}/Models/CMS-HGG_sigfit_packaged_${proc}_${cat}_${year}.root ./${dir}/${dir}/CMS-HGG_sigfit_packaged_${proc}_node_cHHH${node}_${cat}_${year}.root
-cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}/Models/CMS-HGG_multipdf_${cat}_${year}.root ./${dir}/${dir}/
-cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}/Models/CMS-HGG_multipdf_${cat}_${year}.root ./${dir}/${dir}/
-cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}/Models/CMS-HGG_sigfit_packaged_tth_${cat}_${year}.root ./${dir}/${dir}/
-cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}/Models/CMS-HGG_sigfit_packaged_ggh_${cat}_${year}.root ./${dir}/${dir}/
-cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}/Models/CMS-HGG_sigfit_packaged_vbf_${cat}_${year}.root ./${dir}/${dir}/
-cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}/Models/CMS-HGG_sigfit_packaged_wzh_${cat}_${year}.root ./${dir}/${dir}/
+cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}_${ext}/Models/CMS-HGG_sigfit_packaged_${proc}_${cat}_${year}.root ./${dir}/${dir}/CMS-HGG_sigfit_packaged_${proc}_node_cHHH${node}_${cat}_${year}.root
+cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}_${ext}/Models/CMS-HGG_multipdf_${cat}_${year}.root ./${dir}/${dir}/
+cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}_${ext}/Models/CMS-HGG_multipdf_${cat}_${year}.root ./${dir}/${dir}/
+cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}_${ext}/Models/CMS-HGG_sigfit_packaged_tth_${cat}_${year}.root ./${dir}/${dir}/
+cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}_${ext}/Models/CMS-HGG_sigfit_packaged_ggh_${cat}_${year}.root ./${dir}/${dir}/
+cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}_${ext}/Models/CMS-HGG_sigfit_packaged_vbf_${cat}_${year}.root ./${dir}/${dir}/
+cp ./SingleHiggs_${proc}_node_cHHH${node}_${year}_${ext}/Models/CMS-HGG_sigfit_packaged_wzh_${cat}_${year}.root ./${dir}/${dir}/
 done
 done
 done
@@ -60,18 +67,13 @@ sed -i 's#ttH_single_Higgs#tth_single_Higgs#g' $dir/${dir}.txt
 sed -i 's#qqH_single_Higgs#vbf_single_Higgs#g' $dir/${dir}.txt
 sed -i 's#VH_single_Higgs#wzh_single_Higgs#g' $dir/${dir}.txt
 sed -i 's#ggH_single_Higgs#ggh_single_Higgs#g' $dir/${dir}.txt
-if [ "${node}" == "1" ]
-then
-echo "xs_HH_cHHH${node}        rateParam ${cat} ggHH_kl_${node}_kt_1_*4Q 31.049" >> $dir/${dir}.txt
-elif [ "${node}" == "2p45" ]
-then
-echo "xs_HH_cHHH${node}        rateParam ${cat} ggHH_kl_${node}_kt_1_*4Q 13.126" >> $dir/${dir}.txt
-else
-echo "xs_HH_cHHH${node}        rateParam ${cat} ggHH_kl_${node}_kt_1_*4Q 91.174" >> $dir/${dir}.txt
-fi
 done
 done
 done
+echo "xs_HH_cHHH1        rateParam * ggHH_kl_1_kt_1_*4Q 31.049" >> $dir/${dir}.txt
+echo "xs_HH_cHHH2p45        rateParam * ggHH_kl_2p45_kt_1_*4Q 13.126" >> $dir/${dir}.txt
+echo "xs_HH_cHHH5        rateParam * ggHH_kl_5_kt_1_*4Q 91.174" >> $dir/${dir}.txt
+
 echo "br_HH_WWgg    rateParam  * ggHH_kl_*_kt_1_*_hwwhgg4Q 0.000970198" >>$dir/${dir}.txt
 echo "br_HH_ZZgg    rateParam  * ggHH_kl_*_kt_1_*_hzzhgg4Q 0.000119992" >>$dir/${dir}.txt
 echo "br_WW_4Q    rateParam  * ggHH_kl_*_kt_1_*_hwwhgg4Q 0.4544" >>$dir/${dir}.txt

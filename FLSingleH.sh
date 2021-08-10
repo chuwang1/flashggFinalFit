@@ -3,8 +3,6 @@ eval `scramv1 runtime -sh`
 source ./setup.sh
 ############################################
 SingleHiggs=("tth" "wzh" "vbf" "ggh")
-# Names=("SingleHiggs_ttHJetToGG_2017_CategorizedTrees" "SingleHiggs_VHToGG_2017_CategorizedTrees" "SingleHiggs_VBFHToGG_2017_CategorizedTrees" "SingleHiggs_GluGluHToGG_2017_CategorizedTrees")
-# Names=("ttHJetToGG" "VHToGG" "VBFHToGG" "GluGluHToGG")
 years=("2018" "2016" "2017")
 for year in ${years[@]}
 do
@@ -18,7 +16,7 @@ do
   do
     Name=${Names[$i]}
     procs=${SingleHiggs[$i]}
-    ext='FL'
+    ext='FL_pt100'
     cat='HHWWggTag_FL_0' #output cat name, it will be used in subsequence step
     InputTreeCats='HHWWggTag_2' #input cat name in the tree
     catNames=(${cat//,/ })
@@ -32,16 +30,16 @@ do
     else
       TreePath="/eos/user/a/atishelm/ntuples/HHWWgg_flashgg/January_2021_Production/2018/Single_H_2018_hadded/"
     fi
-    InputWorkspace="/eos/user/c/chuw/HHWWggWorkspace/FL_withPt_over_Mass_dipho_pt91_LO/" #where you place output workspace
+    InputWorkspace="/eos/user/c/chuw/HHWWggWorkspace/FL_withPt_over_Mass_dipho_pt100/" #where you place output workspace
     doSelections="1"
-    Selections='((Leading_Photon_pt/CMS_hgg_mass) > 1/3. \&\& (Subleading_Photon_pt/CMS_hgg_mass) > 1/4. ) \&\& dipho_pt > 91' # Seletions you want to applied.
-    Replace="HHWWggTag_FL_0"
+    Selections='((Leading_Photon_pt/CMS_hgg_mass) > 1/3. \&\& (Subleading_Photon_pt/CMS_hgg_mass) > 1/4. ) \&\& dipho_pt > 100' # Seletions you want to applied.
+    Replace="tth"
     ############################################
     #  Tree selectors#
     #
     ############################################
     cp ./Signal/tools/replacementMapHHWWgg.py ./Signal/tools/replacementMap.py
-    sed -i "s#REPLACEMET_CATWV#${Replace}#g" ./Signal/tools/replacementMap.py
+    sed -i "s#REPLACEMENT#${Replace}#g" ./Signal/tools/replacementMap.py
     path=`pwd`
     cd ./Reweight/
     echo $Name $procs
@@ -69,7 +67,7 @@ do
     then
       sed -i "s#metUncUncertainty\"#metUncUncertainty\",\"JetHEM\"#g" SingleHiggsSelections_Run.C
     fi
-    root -b -q SingleHiggsSelections_Run.C
+    # root -b -q SingleHiggsSelections_Run.C
     mv ${Name}_${year}.root  ../Trees2WS/
     cd ../Trees2WS/
 
@@ -91,7 +89,7 @@ fi
 sed -i "s#2017#${year}#g" HHWWgg_config_run.py
 sed -i "s#auto#${cat}#g" HHWWgg_config_run.py
 rm -rf ws*
-python trees2ws.py --inputConfig HHWWgg_config_run.py --inputTreeFile ./${Name}_${year}.root --inputMass ${mass} --productionMode ${procs}  --year ${year} --doSystematics
+# python trees2ws.py --inputConfig HHWWgg_config_run.py --inputTreeFile ./${Name}_${year}.root --inputMass ${mass} --productionMode ${procs}  --year ${year} --doSystematics
 rm HHWWgg_config_run.py
 for catName in ${catNames[@]}
 do

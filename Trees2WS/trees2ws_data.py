@@ -83,7 +83,7 @@ else:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # UPROOT file
 f = uproot.open(opt.inputTreeFile)
-if inputTreeDir == '': listOfTreeNames == f.keys()
+if inputTreeDir == '': listOfTreeNames = f.keys()
 else: listOfTreeNames = f[inputTreeDir].keys()
 # If cats = 'auto' then determine from list of trees
 if cats == 'auto':
@@ -127,7 +127,8 @@ for cat in cats:
   t = f.Get(treeName)
 
   # Define dataset for cat
-  dname = "Data_%s_%s"%(sqrts__,cat)  
+  newcat=cat.replace("SL_","SLDNN_")
+  dname = "Data_%s_%s"%(sqrts__,newcat)  
   d = ROOT.RooDataSet(dname,dname,aset,'weight')
 
   # Loop over events in tree and add to dataset with weight 1

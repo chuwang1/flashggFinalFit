@@ -140,6 +140,6 @@ if opts.plots:
         if opts.gaussianFit:
            r.gStyle.SetOptFit(111)
            pullHist.Fit('gaus')
-           muHist.Fit('gaus')
+           #  muHist.Fit('gaus')
         canv.SaveAs('%s.pdf'%plotName(name,output))
         canv.SaveAs('%s.png'%plotName(name,output))

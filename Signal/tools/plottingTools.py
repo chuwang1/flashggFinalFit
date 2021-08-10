@@ -436,7 +436,7 @@ def plotSignalModel(_hists,_opt,_outdir=".",Label="cHHH1",offset=0.02):
   if ( "SL" in Label and "tth" not in Label and "vbf" not in Label and "wzh" not in Label and "ggh" not in Label ):
     Scale=31.049*0.441*0.000970198
   elif ( "FL" in Label and "tth" not in Label and "vbf" not in Label and "wzh" not in Label and "ggh" not in Label ):
-    Scale=31.049*0.1071*0.000970198
+    Scale=31.049*0.1046*0.000970198
   elif ( "FH" in Label and "ZZ" not in Label and "tth" not in Label and "vbf" not in Label and "wzh" not in Label and "ggh" not in Label ):
     Scale=31.049*0.4544*0.000970198
   elif ( "ZZ" in Label and "tth" not in Label and "vbf" not in Label and "wzh" not in Label and "ggh" not in Label ):
@@ -454,7 +454,9 @@ def plotSignalModel(_hists,_opt,_outdir=".",Label="cHHH1",offset=0.02):
   _hists['data'].Scale(Scale)
   _hists['pdf'].Scale(Scale)
   h_axes.SetMaximum(_hists['data'].GetMaximum()*1.2)
-  h_axes.SetMinimum(0.)
+  print "Min:",_hists['data'].GetMinimum()
+  min_val=min(0.,_hists['data'].GetMinimum())
+  h_axes.SetMinimum(min_val)
   h_axes.GetXaxis().SetRangeUser(105,140)
   h_axes.SetTitle("")
   h_axes.GetXaxis().SetTitle("%s (%s)"%(_opt.xvar.split(":")[1],_opt.xvar.split(":")[2]))

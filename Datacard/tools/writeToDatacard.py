@@ -149,7 +149,6 @@ def writeSystematic(f, d, s, options, stxsMergeScheme=None, scaleCorrScheme=None
                         if r['proc'] == "data_obs":
                             continue
                         # Extract value and add to line (with checks)
-                        print "============"
                         if "HH" in s['name'] or "ttH" in s['name'] or "VH" in s['name'] or "ggH" in s['name'] or "VBF" in s['name']:
                             if "HH"  in r['proc'] and "HH" in s['name']:
                                 sval = r["%s%s%s" % (s['name'], mergeStr, tierStr)]

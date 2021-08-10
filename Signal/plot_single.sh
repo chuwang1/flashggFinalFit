@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 eval `scramv1 runtime -sh`
 source ../setup.sh
-cats="HHWWggTag_SLDNN_0,HHWWggTag_SLDNN_1,HHWWggTag_SLDNN_2,HHWWggTag_SLDNN_3"
-ext="SL"
+cats="HHWWggTag_FHDNN_0,HHWWggTag_FHDNN_1,HHWWggTag_FHDNN_2,HHWWggTag_FHDNN_3"
+ext="FH_without_signleH_training"
 python RunPackager.py --cats ${cats} --exts ${ext}_${1}_2016_single_Higgs,${ext}_${1}_2017_single_Higgs,${ext}_${1}_2018_single_Higgs --mergeYears --batch local  --massPoints 125
 years=("2016" "2017" "2018")
 catNames=(${cats//,/ })
