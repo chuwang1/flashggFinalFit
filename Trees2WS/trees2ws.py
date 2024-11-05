@@ -43,9 +43,9 @@ from tools.commonTools import *
 from tools.commonObjects import *
 from tools.STXS_tools import *
 
-print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
 def leave():
-  print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
   sys.exit(1)
 
 # Function to add vars to workspace
@@ -106,10 +106,10 @@ if opt.inputConfig != '':
     cats             = _cfg['cats']
 
   else:
-    print "[ERROR] %s config file does not exist. Leaving..."%opt.inputConfig
+    print("[ERROR] %s config file does not exist. Leaving..."%opt.inputConfig)
     leave()
 else:
-  print "[ERROR] Please specify config file to run from. Leaving..."%opt.inputConfig
+  print("[ERROR] Please specify config file to run from. Leaving..."%opt.inputConfig)
   leave()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -147,7 +147,7 @@ if opt.doNOTAG:
     if "sigma" in tn: continue
     if "NOTAG" in tn: cats.append("NOTAG")
   if "NOTAG" not in cats:
-    print " --> [WARNING] NOTAG tree does not exist in input file. Not including NOTAG"
+    print(" --> [WARNING] NOTAG tree does not exist in input file. Not including NOTAG")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 1) Convert tree to pandas dataframe
@@ -157,10 +157,10 @@ if opt.doSystematics: sdata = pandas.DataFrame()
 
 # Loop over categories: fill dataframe
 for cat in cats:
-  print " --> Extracting events from category: %s"%cat
+  print(" --> Extracting events from category: %s"%cat)
   if inputTreeDir == '': treeName = "%s_%s_%s_%s"%(opt.productionMode,opt.inputMass,sqrts__,cat)
   else: treeName = "%s/%s_%s_%s_%s"%(inputTreeDir,opt.productionMode,opt.inputMass,sqrts__,cat)
-  print "    * tree: %s"%treeName
+  print("    * tree: %s"%treeName)
   # Extract tree from uproot
   t = f[treeName]
   if len(t) == 0: continue
@@ -220,7 +220,7 @@ for cat in cats:
     if cat == "NOTAG": continue
     sdf = pandas.DataFrame()
     for s in systematics:
-      print "    --> Systematic: %s"%re.sub("YEAR",opt.year,s)
+      print("    --> Systematic: %s"%re.sub("YEAR",opt.year,s))
       for direction in ['Up','Down']:
         streeName = "%s_%s%s01sigma"%(treeName,s,direction)
         # If year in streeName then replace by year being processed
@@ -267,7 +267,7 @@ for stxsId in data[stxsVar].unique():
     outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%stxsBin
     if not os.path.exists(outputWSDir): os.system("mkdir %s"%outputWSDir)
     outputWSFile = outputWSDir+"/"+re.sub(".root","_%s.root"%stxsBin,opt.inputTreeFile.split("/")[-1])
-    print " --> Creating output workspace for STXS bin: %s (%s)"%(stxsBin,outputWSFile)
+    print(" --> Creating output workspace for STXS bin: %s (%s)"%(stxsBin,outputWSFile))
     
   else:
     df = data
@@ -277,7 +277,7 @@ for stxsId in data[stxsVar].unique():
     outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%dataToProc(opt.productionMode)
     if not os.path.exists(outputWSDir): os.system("mkdir %s"%outputWSDir)
     outputWSFile = outputWSDir+"/"+re.sub(".root","_%s.root"%dataToProc(opt.productionMode),opt.inputTreeFile.split("/")[-1])
-    print " --> Creating output workspace: (%s)"%outputWSFile
+    print(" --> Creating output workspace: (%s)"%outputWSFile)
     
   # Open file and initiate workspace
   fout = ROOT.TFile(outputWSFile,"RECREATE")

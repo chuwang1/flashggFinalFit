@@ -40,7 +40,7 @@ def getEffSigma(_h):
         r+=y
         if r>rlim: reachedLimit = True
       else:
-        print " --> Reach nBins in effSigma calc: %s. Returning 0 for effSigma"%_h.GetName()
+        print((" --> Reach nBins in effSigma calc: %s. Returning 0 for effSigma"%_h.GetName()))
         return 0
       # Down:
       if( not reachedLimit ):
@@ -51,7 +51,7 @@ def getEffSigma(_h):
           r+=y
           if r>rlim: reachedLimit = True
         else:
-          print " --> Reach 0 in effSigma calc: %s. Returning 0 for effSigma"%_h.GetName()
+          print((" --> Reach 0 in effSigma calc: %s. Returning 0 for effSigma"%_h.GetName()))
           return 0
     # Calculate fractional width in bin takes above limt (assume linear)
     if y == 0.: dx = 0.
@@ -243,10 +243,10 @@ def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc=''
     pdfItr = 0
     for k,v in pdfs.iteritems():
       if pdfItr == 0:
-	if "gaus" in k: frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_g0_constrained")
-	else: frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_constrained")
+        if "gaus" in k: frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_g0_constrained")
+        else: frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_constrained")
       else:
-	frac = ssf.Pdfs['final'].getComponents().getRealValue("%s_%s_recursive_fraction_%s"%(ssf.proc,ssf.cat,k))
+        frac = ssf.Pdfs['final'].getComponents().getRealValue("%s_%s_recursive_fraction_%s"%(ssf.proc,ssf.cat,k))
       # Create histogram with 1600 bins
       hists[k] = v.createHistogram("h_%s%s"%(k,_extension),ssf.xvar,ROOT.RooFit.Binning(1600))
       hists[k].Scale(frac)

@@ -168,7 +168,7 @@ def addSyst(l,v,s,p,c):
       if abs(v[0]-1)<0.0005: l += "%-15s "%"-"
       # Check 2: variation is not negative. Print message and add - to datacard (cleaned later)
       elif v[0] < 0.: 
-        print " --> [WARNING] systematic %s: negative variation for (%s,%s)"%(s,p,c)
+        print(" --> [WARNING] systematic %s: negative variation for (%s,%s)"%(s,p,c))
         #vstr = "%s"%v[0]
         vstr = "-"
         l += "%-15s "%v[0]
@@ -180,7 +180,7 @@ def addSyst(l,v,s,p,c):
       if(abs(v[0]-1)<0.0005)&(abs(v[1]-1)<0.0005): l += "%-15s "%"-"
       # Check 2: neither variation is negative. Print message and add - to datacard (cleaned later)
       elif(v[0]<0.)|(v[1]<0.):
-        print " --> [WARNING] systematic %s: negative variation for (%s,%s)"%(s,p,c)
+        print(" --> [WARNING] systematic %s: negative variation for (%s,%s)"%(s,p,c))
         #vstr = "%.3f/%.3f"%(v[0],v[1])
         vstr = "-"
         l += "%-15s "%vstr
@@ -191,7 +191,7 @@ def addSyst(l,v,s,p,c):
         l += "%-15s "%vstr
     return l
   else:
-    print " --> [ERROR] systematic %s: value does not have type string or list for (%s,%s). Leaving..."%(s['title'],p,c)
+    print(" --> [ERROR] systematic %s: value does not have type string or list for (%s,%s). Leaving..."%(s['title'],p,c))
     sys.exit(1)
 
 def writeMCStatUncertainty(f,d,options):

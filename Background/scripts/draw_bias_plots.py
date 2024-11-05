@@ -91,7 +91,7 @@ def drawHists():
     truth = name.split('_mu')[0]
     if truth not in truth_mods: truth_mods.append(truth)
 
-  print truth_mods
+  print(truth_mods)
 
   muHistDummy = r.TH1F('muHistDummy','',len(truth_mods),0,len(truth_mods))
   l = r.TF1('l','0.',0.,len(truth_mods))

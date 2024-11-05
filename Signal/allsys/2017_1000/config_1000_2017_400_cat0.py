@@ -5,7 +5,7 @@ _year = '2017'
 signalScriptCfg = {
   
   # Setup
-  'inputWSDir':'/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2017/root/ws_gghh_cat0_400',
+  'inputWSDir':'/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2017/root/addsys/ws_gghh_cat0_400/',
   'procs':'auto', # if auto: inferred automatically from filenames
   'cats':'auto', # if auto: inferred automatically from (0) workspace
   'ext':'dcb_%s_res_M1000_M400_cat0'%_year,

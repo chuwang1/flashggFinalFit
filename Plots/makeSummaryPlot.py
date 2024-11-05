@@ -263,10 +263,10 @@ def MakeGraph(drawlist, hframe, label='Error', valid_checks=[],productionMode=No
             if not info["%sHi" % v]:
                 valid_hi = False
         if not valid_lo:
-            print 'Warning, entry %sLo for %s is not valid' % (label, info["Name"])
+            print('Warning, entry %sLo for %s is not valid' % (label, info["Name"]))
             # err_lo = 0.0
         if not valid_hi:
-            print 'Warning, Entry %sHi for %s is not valid' % (label, info["Name"])
+            print('Warning, Entry %sHi for %s is not valid' % (label, info["Name"]))
             # err_hi = 0.0
         gr_bar.SetPointError(i, err_lo, err_hi, 0., 0.)
     return gr_bar
@@ -375,7 +375,7 @@ if __name__ == "__main__":
         poilist.extend(pois)
         drawlist.extend(CopyDataFromJsonFile(jsonfilename, model, pois))
 
-    print drawlist
+    print(drawlist)
 
     N = len(poilist)
 
@@ -531,7 +531,7 @@ if __name__ == "__main__":
         for il in xrange(remove_x_labels):
             hframe.GetXaxis().ChangeLabel(-1 * il, -1, -1, -1, -1, -1, " ")
         # n_labels = hframe.GetXaxis().GetLabels().GetSize()
-        # print n_labels
+        # print(n_labels)
 
 
     if args.hlines == None:

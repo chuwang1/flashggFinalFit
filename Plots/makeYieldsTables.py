@@ -14,9 +14,9 @@ from collections import OrderedDict as od
 from usefulStyle import setCanvas, drawCMS, drawEnPu, drawEnYear, formatHisto
 from shanePalette import set_color_palette
 
-print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG YIELDS TABLES RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG YIELDS TABLES RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
 def leave():
-  print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG YIELDS TABLES RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+  print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG YIELDS TABLES RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
   sys.exit(1)
 
 # Define STXS stage 0 mapping to procs
@@ -176,18 +176,18 @@ elif opt.group == "top":
   stage0 = stage0_top
   target_procs = target_procs_top
 else:
-  print " --> [ERROR] target group of categories %s does not exist"%opt.group
+  print(" --> [ERROR] target group of categories %s does not exist"%opt.group)
   leave()
 
 # Load input dataFrame from pickle file
 if not os.path.exists( opt.inputPkl ): 
-  print " --> [ERROR] Input pickle file does not exist. Leaving"
+  print(" --> [ERROR] Input pickle file does not exist. Leaving")
   leave()
 with open( opt.inputPkl, "rb" ) as fin: data = pickle.load(fin)
 # Load cat info dataframe
 if opt.loadCatInfo != '':
   if not os.path.exists( opt.loadCatInfo ):
-    print " --> [ERROR] Cat info pickle file does not exist. Leaving"
+    print(" --> [ERROR] Cat info pickle file does not exist. Leaving")
     leave()
   with open( opt.loadCatInfo, "rb" ) as fin: catinfo_data = pickle.load(fin)
 

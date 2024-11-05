@@ -21,7 +21,8 @@
 #include "RooFitResult.h"
 #include "RooPlot.h"
 #include "RooMsgService.h"
-#include "RooMinuit.h"
+// #include "RooMinuit.h"
+#include "RooMinimizer.h"
 #include "RooPolynomial.h"
 #include "RooRandom.h"
 

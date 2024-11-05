@@ -130,7 +130,7 @@ TheorySystVals = od()
 OtherSystVals = od()
 for gr, systs in ExpSystGroups.iteritems():
   ExpSystVals[gr] = {}
-  print " --> %s"%gr
+  print(" --> %s"%gr)
   # Loop over pois
   for poi in opt.pois.split(","):
     u_up, u_down = 0, 0
@@ -139,7 +139,7 @@ for gr, systs in ExpSystGroups.iteritems():
         if p['name'] == s:
           a = p[poi][0]-p[poi][1]
           b = p[poi][2]-p[poi][1]
-          #print "   * %s: %.4f, %.4f"%(s,a,b)
+          #print("   * %s: %.4f, %.4f"%(s,a,b))
           # If one-sided then take highest variation
           if a*b > 0: 
             if abs(a) > abs(b):
@@ -155,13 +155,13 @@ for gr, systs in ExpSystGroups.iteritems():
             else:
               u_up += b*b
               u_down += a*a
-    print "   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down))
+    print("   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down)))
     ExpSystVals[gr]['%s_up'%poi] = math.sqrt(u_up)
     ExpSystVals[gr]['%s_down'%poi] = math.sqrt(u_down)
 
 for gr, systs in TheorySystGroups.iteritems():
   TheorySystVals[gr] = {}
-  print " --> %s"%gr
+  print(" --> %s"%gr)
   # Loop over pois
   for poi in opt.pois.split(","):
     u_up, u_down = 0, 0
@@ -170,7 +170,7 @@ for gr, systs in TheorySystGroups.iteritems():
         if p['name'] == s:
           a = p[poi][0]-p[poi][1]
           b = p[poi][2]-p[poi][1]
-          #print "   * %s: %.4f, %.4f"%(s,a,b)
+          #print("   * %s: %.4f, %.4f"%(s,a,b))
           # If one-sided then take highest variation
           if a*b > 0: 
             if abs(a) > abs(b):
@@ -186,13 +186,13 @@ for gr, systs in TheorySystGroups.iteritems():
             else:
               u_up += b*b
               u_down += a*a
-    print "   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down))
+    print("   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down)))
     TheorySystVals[gr]['%s_up'%poi] = math.sqrt(u_up)
     TheorySystVals[gr]['%s_down'%poi] = math.sqrt(u_down)
 
 for gr, systs in OtherSystGroups.iteritems():
   OtherSystVals[gr] = {}
-  print " --> %s"%gr
+  print(" --> %s"%gr)
   # Loop over pois
   for poi in opt.pois.split(","):
     u_up, u_down = 0, 0
@@ -201,7 +201,7 @@ for gr, systs in OtherSystGroups.iteritems():
         if p['name'] == s:
           a = p[poi][0]-p[poi][1]
           b = p[poi][2]-p[poi][1]
-          #print "   * %s: %.4f, %.4f"%(s,a,b)
+          #print("   * %s: %.4f, %.4f"%(s,a,b))
           # If one-sided then take highest variation
           if a*b > 0: 
             if abs(a) > abs(b):
@@ -217,7 +217,7 @@ for gr, systs in OtherSystGroups.iteritems():
             else:
               u_up += b*b
               u_down += a*a
-    print "   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down))
+    print("   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down)))
     OtherSystVals[gr]['%s_up'%poi] = math.sqrt(u_up)
     OtherSystVals[gr]['%s_down'%poi] = math.sqrt(u_down)
 
@@ -228,7 +228,7 @@ if opt.inputExpJson != '':
   OtherSystVals_exp = od()
   for gr, systs in ExpSystGroups.iteritems():
     ExpSystVals_exp[gr] = {}
-    print " --> %s"%gr
+    print(" --> %s"%gr)
     #if gr == "Photon identification":
     #  systs = ['CMS_hgg_phoIdMva']#`_2016','CMS_hgg_phoIdMva_2017','CMS_hgg_phoIdMva_2018']
     # Loop over pois
@@ -239,7 +239,7 @@ if opt.inputExpJson != '':
           if p['name'] == s:
             a = p[poi][0]-p[poi][1]
             b = p[poi][2]-p[poi][1]
-            #print "   * %s: %.4f, %.4f"%(s,a,b)
+            #print("   * %s: %.4f, %.4f"%(s,a,b))
             # If one-sided then take highest variation
             if a*b > 0: 
               if abs(a) > abs(b):
@@ -255,7 +255,7 @@ if opt.inputExpJson != '':
               else:
                 u_up += b*b
                 u_down += a*a
-      print "   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down))
+      print("   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down)))
       if( poi == "r_ggH")&( gr in ['Lepton ID and reconstruction','B Tagging','MET'] ):
         ExpSystVals_exp[gr]['%s_up'%poi] = 0.0005
         ExpSystVals_exp[gr]['%s_down'%poi] = 0.0005
@@ -265,7 +265,7 @@ if opt.inputExpJson != '':
 
   for gr, systs in TheorySystGroups.iteritems():
     TheorySystVals_exp[gr] = {}
-    print " --> %s"%gr
+    print(" --> %s"%gr)
     # No UEPS for expected: copy 
     #if gr == "Underlying event and parton shower":
     #  for k, v in TheorySystVals[gr].iteritems():
@@ -279,7 +279,7 @@ if opt.inputExpJson != '':
           if p['name'] == s:
             a = p[poi][0]-p[poi][1]
             b = p[poi][2]-p[poi][1]
-            #print "   * %s: %.4f, %.4f"%(s,a,b)
+            #print("   * %s: %.4f, %.4f"%(s,a,b))
             # If one-sided then take highest variation
             if a*b > 0: 
               if abs(a) > abs(b):
@@ -295,13 +295,13 @@ if opt.inputExpJson != '':
               else:
                 u_up += b*b
                 u_down += a*a
-      print "   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down))
+      print("   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down)))
       TheorySystVals_exp[gr]['%s_up'%poi] = math.sqrt(u_up)
       TheorySystVals_exp[gr]['%s_down'%poi] = math.sqrt(u_down)
 
   for gr, systs in OtherSystGroups.iteritems():
     OtherSystVals_exp[gr] = {}
-    print " --> %s"%gr
+    print(" --> %s"%gr)
     # Loop over pois
     for poi in opt.pois.split(","):
       u_up, u_down = 0, 0
@@ -310,7 +310,7 @@ if opt.inputExpJson != '':
           if p['name'] == s:
             a = p[poi][0]-p[poi][1]
             b = p[poi][2]-p[poi][1]
-            #print "   * %s: %.4f, %.4f"%(s,a,b)
+            #print("   * %s: %.4f, %.4f"%(s,a,b))
             # If one-sided then take highest variation
             if a*b > 0: 
               if abs(a) > abs(b):
@@ -326,7 +326,7 @@ if opt.inputExpJson != '':
               else:
                 u_up += b*b
                 u_down += a*a
-      print "   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down))
+      print("   * %s: (+%.4f,-%.4f)"%(poi,math.sqrt(u_up),math.sqrt(u_down)))
       OtherSystVals_exp[gr]['%s_up'%poi] = math.sqrt(u_up)
       OtherSystVals_exp[gr]['%s_down'%poi] = math.sqrt(u_down)
 

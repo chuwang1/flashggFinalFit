@@ -29,13 +29,13 @@ def get_options():
   parser.add_option('--batch', dest='batch', default='IC', help='Batch')
   parser.add_option('--queue', dest='queue', default='hep.q', help='Queue: can take a while if including all systematics for many categories')
   parser.add_option('--jobOpts', dest='jobOpts', default='', help="Additional options to add to job submission. For Condor separate individual options with a colon (specify all within quotes e.g. \"option_xyz = abc+option_123 = 456\")")
-  parser.add_option('--printOnly', dest='printOnly', default=False, action="store_true", help="Dry run: print submission files only")
+  parser.add_option('--printOnly', dest='printOnly', default=False, action="store_true", help="Dry run: print(submission files only"))
   return parser.parse_args()
 (opt,args) = get_options()
 
-print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RUNNING WS SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RUNNING WS SCRIPTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 def leave():
-  print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RUNNING WS SCRIPTS (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RUNNING WS SCRIPTS (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
   sys.exit(1)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,24 +58,24 @@ options['printOnly']   = opt.printOnly
 
 # Check if mode in allowed options
 if options['mode'] not in ['trees2ws','trees2ws_data','haddMC','haddData','mass_shift']:
-  print " --> [ERROR] mode %s not allowed. Please use one of the following: ['trees2ws','trees2ws_data','haddMC','haddData','mass_shift']. Leaving..."%options['mode']
+  print(" --> [ERROR] mode %s not allowed. Please use one of the following: ['trees2ws','trees2ws_data','haddMC','haddData','mass_shift']. Leaving..."%options['mode'])
   leave()
 
-# print info to user
-print " --> Input directory: %s"%options['inputDir']
-print " --> Year: %s"%(options['year'])
+# print(info to user)
+print(" --> Input directory: %s"%options['inputDir'])
+print(" --> Year: %s"%(options['year']))
 if options['mode'] in ['trees2ws','trees2ws_data']:
-  print " --> Input config: %s"%options['inputConfig']
+  print(" --> Input config: %s"%options['inputConfig'])
 if options['mode'] in ['haddMC']:
-  print " --> flashgg path: %s"%options['flashggPath']
-  print " --> Output RooWorkspace directory: %s"%options['outputWSDir']
+  print(" --> flashgg path: %s"%options['flashggPath'])
+  print(" --> Output RooWorkspace directory: %s"%options['outputWSDir'])
 
-if options['mode'] == "trees2ws": print " --> Converting ROOT Trees to FinalFits compatible RooWorkspace for MC..."
-elif options['mode'] == "trees2ws_data": print " --> Converting ROOT Trees to FinalFits compatible RooWorkspace for data..."
-elif options['mode'] == "haddMC": print " --> Hadd MC workspaces..."
-elif options['mode'] == "haddData": print " --> Hadd data workspaces..."
-elif options['mode'] == "mass_shift": print " --> Ad-hoc shifting of mass in RooWorkspaces..."
-print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+if options['mode'] == "trees2ws": print(" --> Converting ROOT Trees to FinalFits compatible RooWorkspace for MC...")
+elif options['mode'] == "trees2ws_data": print(" --> Converting ROOT Trees to FinalFits compatible RooWorkspace for data...")
+elif options['mode'] == "haddMC": print(" --> Hadd MC workspaces...")
+elif options['mode'] == "haddData": print(" --> Hadd data workspaces...")
+elif options['mode'] == "mass_shift": print(" --> Ad-hoc shifting of mass in RooWorkspaces...")
+print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Make directory to store job scripts and output
@@ -83,13 +83,13 @@ if not os.path.isdir("%s/outdir_%s"%(twd__,options['ext'])): os.system("mkdir %s
 
 # Write submission files: style depends on batch system
 writeSubFiles(options)
-print "  --> Finished writing submission scripts"
+print("  --> Finished writing submission scripts")
 
 # Submit scripts to batch system
 if not options['printOnly']:
   submitFiles(options)
 else:
-  print "  --> Running with printOnly option. Will not submit scripts"
+  print("  --> Running with printOnly option. Will not submit scripts")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 leave()

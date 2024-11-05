@@ -77,7 +77,7 @@ def makePullPlot(h,ext,truth,usefit):
 
 def makeDecompositionPulls(hlist,ext,truth):
 	if len(hlist)<1: return
-	print hlist
+	print(hlist)
 	tnames = []
 	gmax=0
 	for i,h in enumerate(hlist):	
@@ -194,7 +194,7 @@ def makePlot():
 
   while not FileIsOk:
     if dummyIndex >= len(options.files): break
-    print "Trying ",options.files[dummyIndex]
+    print("Trying ",options.files[dummyIndex])
     dummyFile = r.TFile.Open(options.files[dummyIndex])
     try:
       kkeys = dummyFile.GetListOfKeys()
@@ -215,7 +215,7 @@ def makePlot():
     if truth not in truth_mods: truth_mods.append(truth)
   dummyFile.Close()
 
-  print truth_mods
+  print(truth_mods)
 
   canv = r.TCanvas()
   canv.SetGridy(1)
@@ -328,7 +328,7 @@ def makePlot():
 	  tronlyHists = []
 	  for tr_o in truth_mods:
 	    tronlyHists.append(f.Get('%s_mu%sPull_bfit_%s_only'%(truth,stype,tr_o)))
-	    #print tronlyHists
+	    #print(tronlyHists)
 	  makeDecompositionPulls(tronlyHists,ext,val)
 	  tronlyHists = []
 

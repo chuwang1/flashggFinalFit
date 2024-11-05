@@ -18,9 +18,9 @@ from collections import OrderedDict
 from plottingTools import getEffSigma, makeSplusBPlot
 from shanePalette import set_color_palette
 
-print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG 2D PLOTTER RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG 2D PLOTTER RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
 def leave():
-  print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG 2D PLOTTER RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+  print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG 2D PLOTTER RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
   sys.exit(1)
 
 ROOT.gROOT.SetBatch(True)

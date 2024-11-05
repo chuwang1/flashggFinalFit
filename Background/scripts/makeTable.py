@@ -22,7 +22,7 @@ stypes=['Fab','Paul','Chi2','AIC']
 nameDict={'Fab':'Hgg Nominal','Paul':'Envelope (no pen)','Chi2':'Envelope (1/dof)','AIC':'Envelope (2/dof)'}
 truthDict={'pol':'Bernstein','exp':'Exponential','pow':'PowerLaw','lau':'Laurent','key':'Kernal Est','reg':'Regression','hyb':'Hybrid'}
 
-print categories
+print(categories)
 
 import ROOT as r
 
@@ -86,7 +86,7 @@ def findGraph(file,year,cat,ftype,truth,stype,ext):
       pullGraph = inf.Get(matches[0])
       return pullGraph
     else:
-      print 'matches:', matches
+      print('matches:', matches)
       sys.exit('Not good enough. Too many matches')
 
 outf = open('CoverageTable.txt','w')
@@ -109,7 +109,7 @@ for year, catlist in categories.items():
     for ftype in ftypes:
       #outf.write('Function of %s\n'%ftype)
       for truth in findTruths(year,cat):
-        #print truth
+        #print(truth)
         if truth=='kpdf':
           func = 'key'
           order = 1
@@ -141,7 +141,7 @@ for year, catlist in categories.items():
             outf.write(' & \\textbf{%4.2f}$\\pm$%4.2f '%(pullDev[0],pullDev[1]))
           else:
             outf.write(' & %4.2f$\\pm$%4.2f '%(pullDev[0],pullDev[1]))
-          #print year, cat, ftype, stype, truth, getBiggestDeviation(pullGraph,0.), getBiggestDeviation(cov1sigGraph,0.683)
+          #print(year, cat, ftype, stype, truth, getBiggestDeviation(pullGraph,0.), getBiggestDeviation(cov1sigGraph,0.683))
         outf.write(' \\\\ \n')
   
   outf.write('\t\t\t\\hline\n')

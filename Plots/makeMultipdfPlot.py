@@ -34,7 +34,7 @@ def get_options():
 
 
 if opt.inputWSFile is not None:
-  print " --> Opening workspace: %s"%opt.inputWSFile
+  print(" --> Opening workspace: %s"%opt.inputWSFile)
   f = ROOT.TFile(opt.inputWSFile)
   w = f.Get("multipdf")
 

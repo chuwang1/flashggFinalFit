@@ -33,7 +33,7 @@ def procToProcS0(p):
   elif "tHW" in p: return "thw"
   elif "bbH" in p: return "bbh"
   else: 
-    print " --> [ERROR] proc s0 not realised for process %s. Leaving"%p
+    print(" --> [ERROR] proc s0 not realised for process %s. Leaving"%p)
     sys.exit(1)
 
 # Extract normalisations from workspace

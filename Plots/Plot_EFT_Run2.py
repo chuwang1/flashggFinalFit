@@ -327,7 +327,7 @@ def plotUpperLimits(labels, values, resultType):
     # else:
         # label.DrawLatex(0.7, 0.7 + yboost, "STAT ONLY")
 
-    print " "
+    print(" ")
 
     outFile = ''
     outFile += ol + '/'
@@ -414,8 +414,8 @@ def plotRatio(values, labels1, labels2):
         # green.SetPoint(  2*N-1-i, values[i], limit[1] ) # - 1 sigma
         # yellow.SetPoint( 2*N-1-i, values[i], limit[0] ) # - 2 sigma
         # print'setting point:'
-        # print values[i]
-        # print limit_1[2]/limit_2[2]
+        # print(values[i])
+        # print(limit_1[2]/limit_2[2])
 
         print"ratio", (limit_1[2]/limit_2[2])*(factor_ratio)
 
@@ -608,7 +608,7 @@ def plotNonResUpperLimits(campaign, labels, resultType, plotLabels):
             labels[i]+".AsymptoticLimits.mH125.root"
         print"file name:", file_name
         HHWWgg_factor = 1
-        print labels[i]
+        print(labels[i])
         if "cHHH1" in labels[i]:
             HHWWgg_factor = 31.049
         else:
@@ -916,7 +916,7 @@ def plotNonResUpperLimits(campaign, labels, resultType, plotLabels):
     # else:
     #     label.DrawLatex(0.7, 0.7 + yboost, "STAT ")
 
-    print " "
+    print(" ")
     # c.SaveAs("UpperLimit.png")
 
     outFile = ''
@@ -1058,7 +1058,7 @@ def main():
         #     mLabel = "X%s"%str(m)
         #     massLabels.append(mLabel)
         # massLabels.append("nodeSM")
-        print args.GridLabels
+        print(args.GridLabels)
         nGridLabels = len(args.GridLabels)
         print'nGridLabels:', nGridLabels
         yaxisLabels = ['2.5%', '16%', '50%', '84%', '97.5%']

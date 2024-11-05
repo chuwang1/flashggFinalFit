@@ -76,7 +76,7 @@ def factoryType(d,s):
       if nWeights == 2: return "a_w"
       elif nWeights == 1: return "s_w"
       else:
-        print " --> [ERROR] systematic %s: > 2 weights in workspace. Leaving..."%s['name']
+        print(" --> [ERROR] systematic %s: > 2 weights in workspace. Leaving..."%s['name'])
         sys.exit(1)
 
     # Check if RooDataHist exists for syst
@@ -91,7 +91,7 @@ def factoryType(d,s):
       f.Close()
 
   # If never found:
-  print " --> [ERROR] systematic %s: cannot extract type in factoryType function. Doesn't match requirement for (anti)-symmetric weights or anti-symmetric histograms. Leaving..."
+  print(" --> [ERROR] systematic %s: cannot extract type in factoryType function. Doesn't match requirement for (anti)-symmetric weights or anti-symmetric histograms. Leaving...")
   sys.exit(1)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,7 +117,7 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
   # For systematics stored as weights (a_w,s_w) in nominal RooDataSets
   # Extract nominal dataset
   data_nominal = _inputWS.data(_nominalDataName)
-  # CHECK: is weight in contents: if not then add syst to systToSkip container + print warning
+  # CHECK: is weight in contents: if not then add syst to systToSkip container + print(warning)
   systToSkip = []
   for s,f in _systFactoryTypes.iteritems():
     print("SSSSSS",s)
@@ -125,12 +125,12 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
     elif f == "a_w":
       if( "%sUp01sigma"%s not in _nominalDataContents )|( "%sDown01sigma"%s not in _nominalDataContents ):
 	systToSkip.append(s)
-	print " --> [%s] Weight in nominal RooDataSet for systematic (%s) does not exist for (%s,%s). %s"%(errMessage,s,proc,year,errString)
+	print(" --> [%s] Weight in nominal RooDataSet for systematic (%s) does not exist for (%s,%s). %s"%(errMessage,s,proc,year,errString))
 	if not ignoreWarnings: sys.exit(1) 
     else:
       if s not in _nominalDataContents:
 	systToSkip.append(s)
-	print " --> [%s] Weight in nominal RooDataSet for systematic (%s) does not exist for (%s,%s). %s"%(errMessage,s,proc,year,errString)
+	print(" --> [%s] Weight in nominal RooDataSet for systematic (%s) does not exist for (%s,%s). %s"%(errMessage,s,proc,year,errString))
 	if not ignoreWarnings: sys.exit(1)
 
   # Loop over events and extract reweighted yields
@@ -211,9 +211,9 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
   for s, f in _systFactoryTypes.iteritems():
     if f == "a_h":
       data_hist_up, data_hist_down = _inputWS.data("%s_%sUp01sigma"%(_nominalDataName,s)), _inputWS.data("%s_%sDown01sigma"%(_nominalDataName,s))
-      # Check if datasets exist: if not print warning message and set to nominal weight
+      # Check if datasets exist: if not print(warning message and set to nominal weight)
       if( data_hist_up == None )|( data_hist_down == None ):
-        print " --> [%s] RooDataHist for systematic (%s) does not exist for (%s,%s). %s"%(errMessage,s,proc,year,errString)
+        print(" --> [%s] RooDataHist for systematic (%s) does not exist for (%s,%s). %s"%(errMessage,s,proc,year,errString))
         if not ignoreWarnings: sys.exit(1)
         systYields["%s_up"%s] = data_nominal.sumEntries()
         systYields["%s_down"%s] = data_nominal.sumEntries()
@@ -444,7 +444,7 @@ def compareYield(row,factoryType,sname,mode='default',mname=None):
       return [inc]  
 
   else: 
-    print " --> [ERROR] theory systematic tier %s is not supported. Leaving"%mode
+    print(" --> [ERROR] theory systematic tier %s is not supported. Leaving"%mode)
     sys.exit(1) 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -463,7 +463,7 @@ def groupSystematics(d,systs,options,prefix="scaleWeight",groupings=[],stxsMerge
 
     skipGroup = False
     if( s0 == None )|( s1 == None ):
-      print " --> [WARNING] No systematic exists for prefix %s and group %s. Skipping"%(prefix,gr)
+      print(" --> [WARNING] No systematic exists for prefix %s and group %s. Skipping"%(prefix,gr))
       skipGroup = True
     if skipGroup: continue
 
@@ -511,7 +511,7 @@ def groupSystematics(d,systs,options,prefix="scaleWeight",groupings=[],stxsMerge
 def envelopeSystematics(d,systs,options,regexp=None,stxsMergeScheme=None,_removal=False):
 
   if regexp is None:
-    print " --> [WARNING] No systematics with regexp (None). Cannot form envelope"
+    print(" --> [WARNING] No systematics with regexp (None). Cannot form envelope")
     return d, systs
 
   # Extract systematics with regexp
@@ -519,7 +519,7 @@ def envelopeSystematics(d,systs,options,regexp=None,stxsMergeScheme=None,_remova
   for s in systs:
     if regexp in s['name']: s_regexp.append(s)
   if len(s_regexp) == 0:
-    print " --> [WARNING] No systematics with regexp (%s). Cannot form envelope"%regexp
+    print(" --> [WARNING] No systematics with regexp (%s). Cannot form envelope"%regexp)
     return d, systs
 
   # Determine properties of envelope from first entry: remove "group" tag if in name
@@ -534,7 +534,7 @@ def envelopeSystematics(d,systs,options,regexp=None,stxsMergeScheme=None,_remova
   # Loop over systematic tiers: all enveloped systematics must have the same tiers
   for s in s_regexp:
     if s['tiers'] != env['tiers']:
-      print " --> [WARNING] Systematics in envelope have different tiers. Cannot form envelope"
+      print(" --> [WARNING] Systematics in envelope have different tiers. Cannot form envelope")
   for tier in env['tiers']:
     if tier == 'mnorm':
       if options.doSTXSMerging:

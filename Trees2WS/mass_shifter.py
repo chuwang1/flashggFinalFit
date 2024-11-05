@@ -18,11 +18,11 @@ verbose = opt.verbose
 xvar = opt.xvar
 
 if not os.path.exists( opt.inputWSFile ): 
-  print " --> [ERROR] input file %s does not exist. Leaving..."%(opt.inputWSFile)
+  print(" --> [ERROR] input file %s does not exist. Leaving..."%(opt.inputWSFile))
   sys.exit(1)
 
 if str(opt.inputMass) not in opt.inputWSFile: 
-  print " --> [ERROR] input file %s does not correspond to input mass (%s). Leaving..."%(opt.inputWSFile,str(opt.inputMass))
+  print(" --> [ERROR] input file %s does not correspond to input mass (%s). Leaving..."%(opt.inputWSFile,str(opt.inputMass)))
 
 # Calculate shift
 shift = float(opt.inputMass-opt.targetMass)
@@ -56,7 +56,7 @@ for d_orig in allData:
 
   n_components = n_orig.split("_%s_"%sqrts__)  
   n_shift = re.sub(str(opt.inputMass),str(opt.targetMass),n_components[0])+"_%s_"%sqrts__+n_components[-1]
-  if verbose: print "%s --> %s"%(n_orig,n_shift)
+  if verbose: print("%s --> %s"%(n_orig,n_shift))
 
   # Create an empty clone of original dataset
   shifted_datasets[n_shift] = d_orig.emptyClone( n_shift )

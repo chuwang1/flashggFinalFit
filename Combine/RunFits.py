@@ -6,7 +6,7 @@ from optparse import OptionParser
 import glob
 import json
 
-print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG SUBMIT FITS RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG SUBMIT FITS RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
 
 # subOpts for SGE e.g.: -l h_rt=3:0:0 -l h_vmem=24G -pe hep.pe 2
 
@@ -29,11 +29,11 @@ def get_options():
 (opt,args) = get_options()
 
 def leave():
-  print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG SUBMIT FITS RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+  print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG SUBMIT FITS RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
   exit(1)
 
 def run(cmd):
-  print "%s\n\n"%cmd
+  print("%s\n\n"%cmd)
   os.system(cmd)
 
 def getPdfIndicesFromJson(pdfjson):
@@ -69,7 +69,7 @@ elif( opt.batch == 'SGE' )|( opt.batch == 'IC' ):
   sub_opts += "\'"
   job_opts = "--job-mode SGE %s"%sub_opts
 else:
-  print " --> [ERROR] Batch mode (%s) not supported. Leaving"%opt.batch
+  print(" --> [ERROR] Batch mode (%s) not supported. Leaving"%opt.batch)
   leave()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

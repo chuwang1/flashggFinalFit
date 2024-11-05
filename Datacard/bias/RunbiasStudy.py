@@ -33,8 +33,7 @@ parser.add_option("--split",default=2000,type="int")
 parser.add_option("--selectFunction",default=None)
 parser.add_option("--gaussianFit",action="store_true", default=False)
 (opts,args) = parser.parse_args()
-print
-if opts.nToys>opts.split and not opts.nToys%opts.split==0: raise RuntimeError('The number of toys %g needs to be smaller than or divisible by the split number %g'%(opts.nToys, opts.split))
+print(if opts.nToys>opts.split and not opts.nToys%opts.split==0: raise RuntimeError('The number of toys %g needs to be smaller than or divisible by the split number %g'%(opts.nToys, opts.split)))
 
 import ROOT as r
 r.gROOT.SetBatch(True)
@@ -50,20 +49,16 @@ for pdf in pdfs:
     if pdf.InheritsFrom("RooMultiPdf"):
         if multipdfName is not None: raiseMultiError() 
         multipdfName = pdf.GetName()
-        print 'Conduct bias study for multipdf called %s'%multipdfName
+        print('Conduct bias study for multipdf called %s'%multipdfName)
 multipdf = ws.pdf(multipdfName)
-print
-
-varlist = rooArgSetToList(ws.allCats())
+print(varlist = rooArgSetToList(ws.allCats()))
 indexName = None
 for var in varlist:
     if var.GetName().startswith('pdfindex'):
         if indexName is not None: raiseMultiError()
         indexName = var.GetName()
-        print 'Found index called %s'%indexName
-print
-
-from collections import OrderedDict as od
+        print('Found index called %s'%indexName)
+print(from collections import OrderedDict as od)
 indexNameMap = od()
 for ipdf in range(multipdf.getNumPdfs()):
     if opts.selectFunction is not None:
@@ -85,9 +80,7 @@ if opts.toys:
             toyCmd = toyCmdBase + ' -t %g -n _%s --setParameters %s=%g --freezeParameters %s'%(opts.nToys, name, indexName, ipdf, indexName)
             run(toyCmd, dry=opts.dryRun)
             system('mv higgsCombine_%s* %s'%(name, toyName(name)))
-print
-
-if opts.fits:
+print(if opts.fits:)
     if not path.isdir('BiasFits'): system('mkdir -p BiasFits')
     fitCmdBase = 'combine -m %.4f -d %s -M MultiDimFit -P %s --algo singles %s '%(opts.mH, opts.datacard, opts.poi, opts.combineOptions)
     for ipdf,pdfName in indexNameMap.iteritems():

@@ -75,7 +75,7 @@ def writeSubScript(cat,mlow,mhigh,mstep,outdir,muInject,massInject):
     f.close()
     os.system('chmod +x %s'%f.name)
     if not options.dryRun: os.system('bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name))
-    else: print 'bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name)
+    else: print('bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name))
 
 if not options.readFromDat:
   for cat in options.cats:

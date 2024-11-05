@@ -41,7 +41,7 @@ def getEffSigma(_h):
         r+=y
         if r>rlim: reachedLimit = True
       else:
-        print " --> Reach nBins in effSigma calc: %s. Returning 0 for effSigma"%_h.GetName()
+        print(" --> Reach nBins in effSigma calc: %s. Returning 0 for effSigma"%_h.GetName())
         return 0
       # Down:
       if( not reachedLimit ):
@@ -52,7 +52,7 @@ def getEffSigma(_h):
           r+=y
           if r>rlim: reachedLimit = True
         else:
-          print " --> Reach 0 in effSigma calc: %s. Returning 0 for effSigma"%_h.GetName()
+          print(" --> Reach 0 in effSigma calc: %s. Returning 0 for effSigma"%_h.GetName())
           return 0
     # Calculate fractional width in bin takes above limt (assume linear)
     if y == 0.: dx = 0.

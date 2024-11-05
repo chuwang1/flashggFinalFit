@@ -13,9 +13,9 @@ import json
 from usefulStyle import setCanvas, drawCMS, drawEnPu, drawEnYear, formatHisto
 from shanePalette import set_color_palette
 
-print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG YIELDS RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG YIELDS RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
 def leave():
-  print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG YIELDS RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+  print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG YIELDS RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
   sys.exit(1)
 
 ROOT.gROOT.SetBatch(True)
@@ -167,7 +167,7 @@ if opt.mode == 'migration': cats.insert(0,"NOTAG")
 
 # Load input dataFrame from pickle file
 if not os.path.exists( opt.inputPkl ): 
-  print " --> [ERROR] Input pickle file does not exist. Leaving"
+  print(" --> [ERROR] Input pickle file does not exist. Leaving")
   leave()
 with open( opt.inputPkl, "rb" ) as fin: idata = pickle.load(fin)
 

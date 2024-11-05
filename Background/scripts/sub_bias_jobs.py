@@ -54,7 +54,7 @@ def makejob(cat):
     f.close()
     os.system('chmod +x %s'%f.name)
     if not options.dryRun: os.system('bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name))
-    else: print 'bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name)
+    else: print('bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name))
 
 cats_to_run=[]
 if options.cat==-1:

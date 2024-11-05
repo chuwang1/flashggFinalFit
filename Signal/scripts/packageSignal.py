@@ -91,7 +91,7 @@ for ext, fNames_by_ext in fNames.iteritems():
 # Save to file
 if not os.path.isdir("outdir_%s"%opt.outputExt): os.system("mkdir outdir_%s"%opt.outputExt)
 if opt.mergeYears:
-  print (" --> Writing to: ./outdir_%s/CMS-HGG_sigfit_%s_%s.root")%(opt.outputExt,opt.outputExt,opt.cat)
+  print((" --> Writing to: ./outdir_%s/CMS-HGG_sigfit_%s_%s.root")%(opt.outputExt,opt.outputExt,opt.cat))
   f = ROOT.TFile("./outdir_%s/CMS-HGG_sigfit_%s_%s.root"%(opt.outputExt,opt.outputExt,opt.cat),"RECREATE")
 else:
   print( " --> Writing to: ./outdir_%s/CMS-HGG_sigfit_%s_%s_%s.root")%(opt.outputExt,opt.outputExt,opt.cat,opt.year)

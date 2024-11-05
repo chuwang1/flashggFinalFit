@@ -59,7 +59,7 @@ _columns = ['type','proc','cat','exp_yield','exp_error','theory_yield','theory_e
 df = pd.DataFrame(columns=_columns)
 # Loop over unique: proc,cat,types in input dataframe and fill
 for proc in data['proc'].unique():
-  print " --> Adding process to dataframe: %s"%procToSTXS(proc)
+  print(" --> Adding process to dataframe: %s"%procToSTXS(proc))
   for cat in data[data['proc']==proc]['cat'].unique():
     for mode in data[(data['proc']==proc)&(data['cat']==cat)]['type'].unique():
       mask = (data['type']==mode)&(data['proc']==proc)&(data['cat']==cat)
@@ -88,7 +88,7 @@ ueps_norm = {}
 ueps_norm_err = {}
 #ueps_shape = {}
 for proc in df['proc'].unique():
-  print " --> Proc = %s"%proc
+  print(" --> Proc = %s"%proc)
   ueps_norm[proc] = {}
   ueps_norm_err[proc] = {}
   mask = (df['proc']==proc)&(df['type']=='nominal')

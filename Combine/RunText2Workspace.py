@@ -2,7 +2,7 @@ import os, glob, sys
 from optparse import OptionParser
 from models import models
 
-print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG T2W RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG T2W RUN II ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
 
 def get_options():
   parser = OptionParser()
@@ -17,19 +17,19 @@ def get_options():
 (opt,args) = get_options()
 
 def leave():
-  print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG T2W RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+  print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG T2W RUN II (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
   exit(1)
 
 def run(cmd):
-  print "%s\n\n"%cmd
+  print("%s\n\n"%cmd)
   os.system(cmd)
 
 if opt.mode not in models: 
-  print " --> [ERROR] opt.mode (%s) is not specified in models.py. Leaving..."%opt.mode
+  print(" --> [ERROR] opt.mode (%s) is not specified in models.py. Leaving..."%opt.mode)
   leave()
 
-print " --> Running text2workspace for model: %s"%opt.mode
-print " --> Input: Datacard%s.txt --> Output: Datacard%s_%s.root"%(opt.ext,opt.ext,opt.mode)
+print(" --> Running text2workspace for model: %s"%opt.mode)
+print(" --> Input: Datacard%s.txt --> Output: Datacard%s_%s.root"%(opt.ext,opt.ext,opt.mode))
 
 if not os.path.isdir("./t2w_jobs"): os.system("mkdir ./t2w_jobs")
 # Open submission file to write to
@@ -59,5 +59,5 @@ if opt.batch == 'condor':
 if opt.batch == "condor": subcmd = "condor_submit ./t2w_jobs/t2w_%s%s.sub"%(opt.mode,opt.ext)
 elif opt.batch == 'local': subcmd = "bash ./t2w_jobs/t2w_%s%s.sh"%(opt.mode,opt.ext)
 else: subcmd = "qsub -q hep.q -l h_rt=6:0:0 -l h_vmem=24G ./t2w_jobs/t2w_%s%s.sh"%(opt.mode,opt.ext)
-if opt.dryRun: print "[DRY RUN] %s"%subcmd
+if opt.dryRun: print("[DRY RUN] %s"%subcmd)
 else: run(subcmd)
