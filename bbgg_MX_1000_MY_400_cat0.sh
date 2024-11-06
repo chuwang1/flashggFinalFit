@@ -41,21 +41,21 @@ path='/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/data'
 # mkdir -p ws_cat0_400
 # mv ws/data_400_cat0.root ws_cat0_400/allData.root 
 cd /afs/cern.ch/work/c/chuw/bbgg/CMSSW_14_1_0_pre4/src/flashggFinalFit/Signal/ 
-# python3 RunSignalScripts.py --inputConfig allsys/2017_1000/config_1000_2017_400_cat0.py --mode 'fTest'
-# python3 RunSignalScripts.py --inputConfig allsys/2017_1000/config_1000_2017_400_cat0.py  --mode calcPhotonSyst
-# python3 RunSignalScripts.py --inputConfig allsys/2017_1000/config_1000_2017_400_cat0.py --mode 'signalFit'
-# python3 RunSignalScripts.py --inputConfig allsys/2018_1000/config_1000_2018_400_cat0.py --mode 'fTest'
-# python3 RunSignalScripts.py --inputConfig allsys/2018_1000/config_1000_2018_400_cat0.py  --mode calcPhotonSyst
-# python3 RunSignalScripts.py --inputConfig allsys/2018_1000/config_1000_2018_400_cat0.py --mode 'signalFit'
-# python3 RunSignalScripts.py --inputConfig allsys/2016pre_1000/config_1000_2016pre_400_cat0.py --mode 'fTest'
-# python3 RunSignalScripts.py --inputConfig allsys/2016pre_1000/config_1000_2016pre_400_cat0.py  --mode calcPhotonSyst
-# python3 RunSignalScripts.py --inputConfig allsys/2016pre_1000/config_1000_2016pre_400_cat0.py --mode 'signalFit'
-# python3 RunSignalScripts.py --inputConfig allsys/2016post_1000/config_1000_2016post_400_cat0.py --mode 'fTest'
-# python3 RunSignalScripts.py --inputConfig allsys/2016post_1000/config_1000_2016post_400_cat0.py  --mode calcPhotonSyst
-# python3 RunSignalScripts.py --inputConfig allsys/2016post_1000/config_1000_2016post_400_cat0.py --mode 'signalFit'
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2017_400_cat0.py --mode 'fTest'
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2017_400_cat0.py  --mode calcPhotonSyst
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2017_400_cat0.py --mode 'signalFit'
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2018_400_cat0.py --mode 'fTest'
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2018_400_cat0.py  --mode calcPhotonSyst
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2018_400_cat0.py --mode 'signalFit'
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2016pre_400_cat0.py --mode 'fTest'
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2016pre_400_cat0.py  --mode calcPhotonSyst
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2016pre_400_cat0.py --mode 'signalFit'
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2016post_400_cat0.py --mode 'fTest'
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2016post_400_cat0.py  --mode calcPhotonSyst
+python3 RunSignalScripts.py --inputConfig configs/config_1000_2016post_400_cat0.py --mode 'signalFit'
 python3 RunPackager.py --cats resolved_cat0 --exts dcb_2017_res_M1000_M400_cat0,dcb_2018_res_M1000_M400_cat0,dcb_2016pre_res_M1000_M400_cat0,dcb_2016post_res_M1000_M400_cat0 --batch local  --massPoints 125 --mergeYears --outputExt packaged_mergeyears_resolved_M1000_M400_cat0
 python3 RunPlotter.py --procs all --cats resolved_cat0 --years 2017,2018,2016pre,2016post  --ext packaged_mergeyears_resolved_M1000_M400_cat0
 file0=`ls outdir_packaged_mergeyears_resolved_M1000_M400_cat0/*.root`
 cp $file0  outdir_packaged_mergeyears_resolved_M1000_M400_cat0/CMS-HGG_sigfit_packaged_resolved_cat0.root
 cd /afs/cern.ch/work/c/chuw/bbgg/CMSSW_14_1_0_pre4/src/flashggFinalFit/Background
-python3 RunBackgroundScripts.py --inputConfig allsys/data_all_1000/config_all_cat0_400.py --mode fTestParallel
+python3 RunBackgroundScripts.py --inputConfig configs/config_all_cat0_400.py --mode fTestParallel
