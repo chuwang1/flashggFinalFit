@@ -5,8 +5,8 @@ import re, glob
 import json
 from optparse import OptionParser
 
-from tools.commonTools import *
-from tools.commonObjects import *
+from commonTools import *
+from commonObjects import *
 from tools.plottingTools import *
 
 def get_options():
