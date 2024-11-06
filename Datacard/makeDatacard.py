@@ -135,7 +135,7 @@ if opt.prune:
 
   else:
     print(" --> Using nominal yield of process (sumEntries) for pruning")
-    print(data)
+    print(data['cat'])
     mask = (data['type']=='sig')
 
     # Extract per category yields
@@ -143,8 +143,12 @@ if opt.prune:
     for cat in data.cat.unique(): catYields[cat] = data[(data['cat']==cat)&(data['type']=='sig')].nominal_yield.sum()
     
     # Set prune = 1 if < threshold of total cat yield
-    mask = (data['nominal_yield']<opt.pruneThreshold*data.apply(lambda x: catYields[x['cat']], axis=1))&(data['type']=='sig')&(~data['cat'].str.contains('NOTAG'))
-    data.loc[mask,'prune'] = 1
+    # mask = (data['nominal_yield']<opt.pruneThreshold*data.apply(lambda x: catYields[x['cat']], axis=1))&(data['type']=='sig')&(~data['cat'].str.contains('NOTAG'))
+    # data.loc[mask,'prune'] = 1
+    print("chuw",data['nominal_yield'])
+    # mask = (data['nominal_yield']<opt.pruneThreshold*data.apply(lambda x: catYields[x['cat']], axis=1))&(data['type']=='sig')&(~data['cat'].str.contains('NOTAG'))
+    # data.loc[mask,'prune'] = 1
+    #//chuw comment
 
   # Finally set all NOTAG events to be pruned
   mask = data['cat'].str.contains("NOTAG")

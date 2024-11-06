@@ -1,156 +1,50 @@
-WhichSamples=${1}
 
+path='/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/data/'
+cd /afs/cern.ch/user/c/chuw/chuw/bbgg/CMSSW_14_1_0_pre4/src/flashggFinalFit/Datacard
 
-if [ ${WhichSamples} -eq 0 ]
-  then
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat0 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat0 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat0 --cats auto --procs auto --batch local --ext M1000_cat0 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat0 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat0 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat0 --cats auto --procs auto --batch local --ext M1500_cat0 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat0 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat0 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat0 --cats auto --procs auto --batch local --ext M2000_cat0 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat0 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat0 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat0 --cats auto --procs auto --batch local --ext M2500_cat0 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat0 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat0 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat0 --cats auto --procs auto --batch local --ext M3000_cat0 >M500_SL_yields.log 2>&1
+for file in $path/data_*400*cat0*.parquet
+do
+    newfile=${file%'_cat'*}
+    i=${newfile##*'data_'}
+    cat=${file%.*}
+    cat=${cat##*'_'}  
+    echo $cat
+    python3 RunYields.py --inputWSDirMap 2018=/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2018/root/addsys/ws_gghh_"$cat"_$i,2017=/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2017/root/addsys/ws_gghh_"$cat"_$i,2016pre=/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2016pre/root/addsys/ws_gghh_"$cat"_$i,2016post=/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2016post/root/addsys/ws_gghh_"$cat"_$i  --sigModelWSDir /afs/cern.ch/user/c/chuw/chuw/bbgg/CMSSW_14_1_0_pre4/src/flashggFinalFit/Signal/signal_1000/outdir_packaged_mergeyears_resolved_M1000_M"$i"_"$cat"  --bkgModelWSDir /afs/cern.ch/user/c/chuw/chuw/bbgg/CMSSW_14_1_0_pre4/src/flashggFinalFit/Background/outdir_1000_M400/ws_"$cat"_$i --cats resolved_"$cat" --procs gghh --batch local --mergeYears --doSystematics --ignore-warnings --ext sys_resolved_combine_M1000_"$cat"_M$i 
+    python3 makeDatacard.py --years 2018,2017,2016pre,2016post --prune --ext sys_resolved_combine_M1000_"$cat"_M$i  --output Datacard_sys_resolved_combine_M1000_"$cat"_M$i --doSystematics 
+done
+
+# for file in $path/signal*2017*cat0.root
+# do
+#     newfile=${file%'_Tune'*}
+#     i=${newfile##*'MY-'}
+#     cat=${file%.*}
+#     cat=${cat##*'boost_'}
+#     echo $i
+#     combineCards.py  Datacard_sys_boost_1000_combine_cat0_M$i.txt Datacard_sys_boost_1000_combine_cat1_M$i.txt Datacard_sys_boost_1000_combine_cat2_M$i.txt Datacard_sys_resolved_combine_M1000_cat0_M$i.txt  > Datacard_sys_1000_combined_M$i.txt
     
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat1 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat1 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat1 --cats auto --procs auto --batch local --ext M1000_cat1 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat1 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat1 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat1 --cats auto --procs auto --batch local --ext M1500_cat1 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat1 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat1 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat1 --cats auto --procs auto --batch local --ext M2000_cat1 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat1 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat1 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat1 --cats auto --procs auto --batch local --ext M2500_cat1 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat1 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat1 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat1 --cats auto --procs auto --batch local --ext M3000_cat1 >M500_SL_yields.log 2>&1
-    
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat2 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat2 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat2 --cats auto --procs auto --batch local --ext M1000_cat2 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat2 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat2 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat2 --cats auto --procs auto --batch local --ext M1500_cat2 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat2 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat2 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat2 --cats auto --procs auto --batch local --ext M2000_cat2 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat2 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat2 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat2 --cats auto --procs auto --batch local --ext M2500_cat2 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat2 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat2 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat2 --cats auto --procs auto --batch local --ext M3000_cat2 >M500_SL_yields.log 2>&1
-    
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat3 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat3 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat3 --cats auto --procs auto --batch local --ext M1000_cat3 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat3 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat3 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat3 --cats auto --procs auto --batch local --ext M1500_cat3 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat3 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat3 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat3 --cats auto --procs auto --batch local --ext M2000_cat3 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat3 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat3 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat3 --cats auto --procs auto --batch local --ext M2500_cat3 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat3 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat3 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat3 --cats auto --procs auto --batch local --ext M3000_cat3 >M500_SL_yields.log 2>&1
-    
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat4 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1000_cat4 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat4 --cats auto --procs auto --batch local --ext M1000_cat4 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat4 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1500_cat4 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat4 --cats auto --procs auto --batch local --ext M1500_cat4 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat4 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2000_cat4 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat4 --cats auto --procs auto --batch local --ext M2000_cat4 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat4 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2500_cat4 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat4 --cats auto --procs auto --batch local --ext M2500_cat4 >M500_SL_yields.log 2>&1
-    python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat4 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M3000_cat4 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws_cat4 --cats auto --procs auto --batch local --ext M3000_cat4 >M500_SL_yields.log 2>&1
-    
-    # python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M1500 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M1500 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws --cats auto --procs auto --batch local --ext M1500 >M1000_SL_yields.log 2>&1
-    # python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2000 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2000 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws --cats auto --procs auto --batch local --ext M2000 >M2000_SL_yields.log 2>&1
-    # python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M2500 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M2500 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws --cats auto --procs auto --batch local --ext M2500 >M3000_SL_yields.log 2>&1
-    # python RunYields.py --inputWSDirMap 2017=/eos/user/z/zhjie/finlafit/ws_gghh_M3000 --sigModelWSDir /eos/user/z/zhjie/finlafit/ws_gghh_M3000 --bkgModelWSDir /eos/user/z/zhjie/finlafit/ws --cats auto --procs auto --batch local --ext M3000 >M3000_SL_yields.log 2>&1
-   
-fi
-if [ ${WhichSamples} -eq 1 ]
-  then
-    python makeDatacard.py --years 2017 --prune --ext 'M1000_cat0' --output Datacard_M1000_cat0  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M1000_cat1' --output Datacard_M1000_cat1  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M1000_cat2' --output Datacard_M1000_cat2  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M1000_cat3' --output Datacard_M1000_cat3  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M1000_cat4' --output Datacard_M1000_cat4  >datacard.log 2>&1
+# done
+# for file in $path/data_*.root
+# do
+#     newfile=${file%'_cat'*}
+#     i=${newfile##*'data_'}
+#     cat=${file%.*}
+#     cat=${cat##*'_'}
 
-    python makeDatacard.py --years 2017 --prune --ext 'M1500_cat0' --output Datacard_M1500_cat0  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M1500_cat1' --output Datacard_M1500_cat1  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M1500_cat2' --output Datacard_M1500_cat2  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M1500_cat3' --output Datacard_M1500_cat3  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M1500_cat4' --output Datacard_M1500_cat4  >datacard.log 2>&1
-
-    python makeDatacard.py --years 2017 --prune --ext 'M2000_cat0' --output Datacard_M2000_cat0  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M2000_cat1' --output Datacard_M2000_cat1  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M2000_cat2' --output Datacard_M2000_cat2  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M2000_cat3' --output Datacard_M2000_cat3  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M2000_cat4' --output Datacard_M2000_cat4  >datacard.log 2>&1
-
-    python makeDatacard.py --years 2017 --prune --ext 'M2500_cat0' --output Datacard_M2500_cat0  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M2500_cat1' --output Datacard_M2500_cat1  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M2500_cat2' --output Datacard_M2500_cat2  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M2500_cat3' --output Datacard_M2500_cat3  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M2500_cat4' --output Datacard_M2500_cat4  >datacard.log 2>&1
-
-    python makeDatacard.py --years 2017 --prune --ext 'M3000_cat0' --output Datacard_M3000_cat0  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M3000_cat1' --output Datacard_M3000_cat1  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M3000_cat2' --output Datacard_M3000_cat2  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M3000_cat3' --output Datacard_M3000_cat3  >datacard.log 2>&1
-    python makeDatacard.py --years 2017 --prune --ext 'M3000_cat4' --output Datacard_M3000_cat4  >datacard.log 2>&1
+#     combineCards.py  Datacard_sys_boost_masscut_combine_cat0_M$i.txt Datacard_sys_boost_masscut_combine_cat1_M$i.txt Datacard_sys_boost_masscut_combine_cat2_M$i.txt  > Datacard_sys_boost_masscut_combined_M$i.txt
+#     combine -M AsymptoticLimits -m 125 -n boost_masscut_$i  Datacard_sys_boost_masscut_combined_M$i.txt --run expected >> limit_boost_masscut.log
+#     echo $newfile >> limit_boost_masscut.log
+# done
 
 
 
+# # path='/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/data'
+# # for file in $path/data_*cat0*.parquet
+# # do
+# #     newfile=${file%'_cat'*}
+# #     i=${newfile##*'data_'}
+# #     cat=${file%.*}
+# #     cat=${cat##*'_'}  
 
-
-
-    # python makeDatacard.py --years 2017 --prune --ext 'M1500' --output Datacard_M1500  >datacard.log 2>&1
-    # python makeDatacard.py --years 2017 --prune --ext 'M2000' --output Datacard_M2000  >datacard.log 2>&1
-    # python makeDatacard.py --years 2017 --prune --ext 'M2500' --output Datacard_M2500  >datacard.log 2>&1
-    # python makeDatacard.py --years 2017 --prune --ext 'M3000' --output Datacard_M3000  >datacard.log 2>&1
-    
-fi
-if [ ${WhichSamples} -eq 2 ]
-  then
-    python cleanDatacard.py --datacard Datacard_M1000_cat0.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M1000_cat1.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M1000_cat2.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M1000_cat3.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M1000_cat4.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-
-    python cleanDatacard.py --datacard Datacard_M1500_cat0.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M1500_cat1.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M1500_cat2.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M1500_cat3.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M1500_cat4.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-
-    python cleanDatacard.py --datacard Datacard_M2000_cat0.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M2000_cat1.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M2000_cat2.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M2000_cat3.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M2000_cat4.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-
-    python cleanDatacard.py --datacard Datacard_M2500_cat0.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M2500_cat1.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M2500_cat2.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M2500_cat3.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M2500_cat4.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-
-    python cleanDatacard.py --datacard Datacard_M3000_cat0.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M3000_cat1.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M3000_cat2.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M3000_cat3.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    python cleanDatacard.py --datacard Datacard_M3000_cat4.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    # python cleanDatacard.py --datacard Datacard_M1500.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    # python cleanDatacard.py --datacard Datacard_M2000.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    # python cleanDatacard.py --datacard Datacard_M2500.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    # python cleanDatacard.py --datacard Datacard_M3000.txt --factor 2 --removeDoubleSided >datacard.log 2>&1
-    
-fi
-if [ ${WhichSamples} -eq 3 ]
-  then
-    combineCards.py Datacard_M1000_cat0.txt Datacard_M1000_cat1.txt Datacard_M1000_cat2.txt Datacard_M1000_cat3.txt Datacard_M1000_cat4.txt > Datacard_combined_M1000.txt  
-    combineCards.py Datacard_M1500_cat0.txt Datacard_M1500_cat1.txt Datacard_M1500_cat2.txt Datacard_M1500_cat3.txt Datacard_M1500_cat4.txt > Datacard_combined_M1500.txt
-    combineCards.py Datacard_M2000_cat0.txt Datacard_M2000_cat1.txt Datacard_M2000_cat2.txt Datacard_M2000_cat3.txt Datacard_M2000_cat4.txt > Datacard_combined_M2000.txt
-    combineCards.py Datacard_M2500_cat0.txt Datacard_M2500_cat1.txt Datacard_M2500_cat2.txt Datacard_M2500_cat3.txt Datacard_M2500_cat4.txt > Datacard_combined_M2500.txt
-    combineCards.py Datacard_M3000_cat0.txt Datacard_M3000_cat1.txt Datacard_M3000_cat2.txt Datacard_M3000_cat3.txt Datacard_M3000_cat4.txt > Datacard_combined_M3000.txt
-
-    
-   
-    # combineCards.py Datacard_M1500.txt > Datacard_combined_M1500.txt
-    # combineCards.py Datacard_M2000.txt > Datacard_combined_M2000.txt
-    # combineCards.py Datacard_M2500.txt > Datacard_combined_M2500.txt
-    # combineCards.py Datacard_M3000.txt > Datacard_combined_M3000.txt
-
-fi
-if [ ${WhichSamples} -eq 4 ]
-  then
-    combine -M AsymptoticLimits -m 125 -n M1000  Datacard_combined_M1000.txt --run expected  >dd2.log 2>&1
-    combine -M AsymptoticLimits -m 125 -n M1500  Datacard_combined_M1500.txt --run expected  >dd2.log 2>&1
-    combine -M AsymptoticLimits -m 125 -n M2000  Datacard_combined_M2000.txt --run expected  >dd3.log 2>&1
-    combine -M AsymptoticLimits -m 125 -n M2500  Datacard_combined_M2500.txt --run expected  >dd4.log 2>&1
-    combine -M AsymptoticLimits -m 125 -n M3000  Datacard_combined_M3000.txt --run expected  >dd5.log 2>&1
-    
-fi
-if [ ${WhichSamples} -eq 5 ]
-  # move limit root file to eos to further analysis 
-  then
-    mv higgsCombineM1000.AsymptoticLimits.mH125.root /eos/user/z/zhjie/datacard
-    mv higgsCombineM1500.AsymptoticLimits.mH125.root /eos/user/z/zhjie/datacard
-    mv higgsCombineM2000.AsymptoticLimits.mH125.root /eos/user/z/zhjie/datacard
-    mv higgsCombineM2500.AsymptoticLimits.mH125.root /eos/user/z/zhjie/datacard
-    mv higgsCombineM3000.AsymptoticLimits.mH125.root /eos/user/z/zhjie/datacard
-    
-fi
+# #     python RunYields.py --inputWSDirMap 2018=/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2018/root/addsys/ws_gghh_"$cat"_$i,2017=/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2017/root/addsys/ws_gghh_"$cat"_$i,2016pre=/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2016pre/root/addsys/ws_gghh_"$cat"_$i,2016post=/eos/cms/store/group/phys_higgs/cmshgg/zhjie/output/output_1000/opt/2016post/root/addsys/ws_gghh_"$cat"_$i  --sigModelWSDir /afs/cern.ch/user/c/chuw/chuw/bbgg/CMSSW_14_1_0_pre4/src/flashggFinalFit/Signal/signal_1000/outdir_packaged_mergeyears_resolved_M1000_M"$i"_$cat/CMS-HGG_sigfit_packaged_resolved_"$cat".root --bkgModelWSDir /afs/cern.ch/user/c/chuw/chuw/bbgg/CMSSW_14_1_0_pre4/src/flashggFinalFit/Background/outdir_1000_M400/ws_"$cat"_$i --cats resolved_"$cat" --procs auto --batch local --mergeYears --doSystematics --ignore-warnings --ext sys_resolved_combine_M1000_"$cat"_M$i 
+# #     python makeDatacard.py --years 2018,2017,2016pre,2016post --prune --ext sys_resolved_combine_M1000_"$cat"_M$i  --output Datacard_sys_resolved_combine_M1000_"$cat"_M$i --doSystematics 
+# # done

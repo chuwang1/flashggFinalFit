@@ -66,7 +66,9 @@ def writeSystematic(f,d,s,options,stxsMergeScheme=None,scaleCorrScheme=None):
   # For signal shape systematics add simple line
   if s['type'] == 'signal_shape':
     stitle = "%s_%s"%(outputWSNuisanceTitle__,s['title'])
-    if s['mode'] != 'other': stitle += "_%s"%outputNuisanceExtMap[s['mode']]
+    if s['mode'] != 'other':
+      if outputNuisanceExtMap[s['mode']] != '':
+        stitle += "_%s"%outputNuisanceExtMap[s['mode']]
     # If not correlated: separate nuisance per year
     if s['mode'] in ['scales','smears']:
       for year in options.years.split(","):
@@ -105,54 +107,54 @@ def writeSystematic(f,d,s,options,stxsMergeScheme=None,scaleCorrScheme=None):
     
       # Construct syst line/lines if separate by year
       if(s['correlateAcrossYears'] == 1)|(s['correlateAcrossYears'] == -1):
-	stitle = "%s%s%s"%(s['title'],mergeStr,tierStr)
-	lsyst = '%-50s  %-10s    '%(stitle,s['prior'])
-	# Loop over categories and then iterate over rows in category
-	for cat in d.cat.unique():
-	  for ir,r in d[d['cat']==cat].iterrows():
-	    if r['proc'] == "data_obs": continue
-	    # Extract value and add to line (with checks)
-	    sval = r["%s%s%s"%(s['name'],mergeStr,tierStr)]
-	    lsyst = addSyst(lsyst,sval,stitle,r['proc'],cat)
-	# Remove final space from line and add to file
-	f.write("%s\n"%lsyst[:-1])
+        stitle = "%s%s%s"%(s['title'],mergeStr,tierStr)
+        lsyst = '%-50s  %-10s    '%(stitle,s['prior'])
+        # Loop over categories and then iterate over rows in category
+        for cat in d.cat.unique():
+          for ir,r in d[d['cat']==cat].iterrows():
+            if r['proc'] == "data_obs": continue
+            # Extract value and add to line (with checks)
+            sval = r["%s%s%s"%(s['name'],mergeStr,tierStr)]
+            lsyst = addSyst(lsyst,sval,stitle,r['proc'],cat)
+        # Remove final space from line and add to file
+        f.write("%s\n"%lsyst[:-1])
         # For uncorrelated scale weights: not for merged bins
         if options.doSTXSScaleCorrelationScheme:
           if(tier!='mnorm')&("scaleWeight" in s['name']):
-	    for ps,psProcs in scaleCorrScheme.iteritems():
-	      psStr = "_%s"%ps
-	      stitle = "%s%s%s"%(s['title'],psStr,tierStr)
-	      lsyst = '%-50s  %-10s    '%(stitle,s['prior'])
-	      # Loop over categories and then iterate over rows in category
-	      for cat in d.cat.unique():
-		for ir,r in d[d['cat']==cat].iterrows():
-		  if r['proc'] == "data_obs": continue
-		  # Remove year+hgg tags from proc
-		  p = re.sub("_2016post_hgg","",r['proc'])
-      # p = re.sub("_2016pre_hgg","",r['proc'])
-		  p = re.sub("_2017_hgg","",p)
-		  p = re.sub("_2018_hgg","",p)
-      # p = re.sub("_2016pre_hgg","",p)
-		  # Add value if in proc in phase space else -
-		  if p in psProcs: sval = r["%s%s"%(s['name'],tierStr)]
-		  else: sval = '-'
-		  lsyst = addSyst(lsyst,sval,stitle,r['proc'],cat)
+            for ps,psProcs in scaleCorrScheme.items():
+              psStr = "_%s"%ps
+              stitle = "%s%s%s"%(s['title'],psStr,tierStr)
+              lsyst = '%-50s  %-10s    '%(stitle,s['prior'])
+              # Loop over categories and then iterate over rows in category
+              for cat in d.cat.unique():
+                for ir,r in d[d['cat']==cat].iterrows():
+                  if r['proc'] == "data_obs": continue
+                  # Remove year+hgg tags from proc
+                  p = re.sub("_2016_hgg","",r['proc'])
+                  p = re.sub("_2017_hgg","",p)
+                  p = re.sub("_2018_hgg","",p)
+                  p = re.sub("_2022preEE_hgg","",p)
+                  p = re.sub("_2022postEE_hgg","",p)
+                  # Add value if in proc in phase space else -
+                  if p in psProcs: sval = r["%s%s"%(s['name'],tierStr)]
+                  else: sval = '-'
+                  lsyst = addSyst(lsyst,sval,stitle,r['proc'],cat)
               # Remove final space from line and add to file
               f.write("%s\n"%lsyst[:-1])
       else:
-	for year in options.years.split(","):
-	  stitle = "%s%s%s_%s"%(s['title'],mergeStr,tierStr,year)
-	  sname = "%s%s%s_%s"%(s['name'],mergeStr,tierStr,year)
-	  lsyst = '%-50s  %-10s    '%(stitle,s['prior'])
-	  # Loop over categories and then iterate over rows in category
-	  for cat in d.cat.unique():
-	    for ir,r in d[d['cat']==cat].iterrows():
-	      if r['proc'] == "data_obs": continue
-	      # Extract value and add to line (with checks)
-	      sval = r[sname]
-	      lsyst = addSyst(lsyst,sval,stitle,r['proc'],cat)
-	  # Remove final space from line and add to file
-	  f.write("%s\n"%lsyst[:-1])
+        for year in options.years.split(","):
+          stitle = "%s%s%s_%s"%(s['title'],mergeStr,tierStr,year)
+          sname = "%s%s%s_%s"%(s['name'],mergeStr,tierStr,year)
+          lsyst = '%-50s  %-10s    '%(stitle,s['prior'])
+          # Loop over categories and then iterate over rows in category
+          for cat in d.cat.unique():
+            for ir,r in d[d['cat']==cat].iterrows():
+              if r['proc'] == "data_obs": continue
+              # Extract value and add to line (with checks)
+              sval = r[sname]
+              lsyst = addSyst(lsyst,sval,stitle,r['proc'],cat)
+          # Remove final space from line and add to file
+          f.write("%s\n"%lsyst[:-1])
   return True
           
 
@@ -217,7 +219,10 @@ def writeMCStatUncertainty(f,d,options):
       for cat in d.cat.unique():
         for ir,r in d[d['cat']==cat].iterrows():
           if r['proc'] == "data_obs": continue
-          sval = scval if cat == scat else '-'
+          elif r['type'] == "sig": 
+            sval = scval if cat == scat else '-'
+          else:
+            sval = '-'
           # Extract value and add to line (with checks)
           lsyst = addSyst(lsyst,sval,stitle,r['proc'],cat)
       # Remove final space from line and add to file

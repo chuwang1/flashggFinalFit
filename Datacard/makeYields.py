@@ -57,16 +57,16 @@ years = inputWSDirMap.keys()
 
 procsMap = od()
 if opt.procs == 'auto':
-  for y,iWSDir in inputWSDirMap.iteritems():
+  for y,iWSDir in inputWSDirMap.items():
     WSFileNames = extractWSFileNames(iWSDir)
     procsMap[y] = extractListOfProcs(WSFileNames)
   # Require common procs for each year
   for i,iy in enumerate(years):
     for j,jy in enumerate(years):
       if j > i:
-	if set(procsMap[iy].split(",")) != set(procsMap[jy].split(",")):
-	  print(" --> [ERROR] Mis-match in list of process for %s and %s. Intersection = %s"%(iy,jy,(set(procsMap[jy]).symmetric_difference(set(procsMap[iy])))))
-	  leave()
+      	if set(procsMap[iy].split(",")) != set(procsMap[jy].split(",")):
+	        print(" --> [ERROR] Mis-match in list of process for %s and %s. Intersection = %s"%(iy,jy,(set(procsMap[jy]).symmetric_difference(set(procsMap[iy])))))
+	        leave()
   # Define list of procs (alphabetically ordered)
   procs = procsMap[years[0]].split(",")
 else: procs = opt.procs.split(",")
@@ -182,25 +182,25 @@ if opt.doSystematics:
     for s in experimental_systematics: 
       print(s)
       if s['type'] == 'factory': 
-	# Fix for HEM as only in 2018 workspaces
-	if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
-	else: experimentalFactoryType[s['name']] = factoryType(data,s)
-	if experimentalFactoryType[s['name']] in ["a_w","a_h"]:
-	  data['%s_up_yield'%s['name']] = '-'
-	  data['%s_down_yield'%s['name']] = '-'
-	else: data['%s_yield'%s['name']] = '-'
+	      # Fix for HEM as only in 2018 workspaces
+	      if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
+	      else: experimentalFactoryType[s['name']] = factoryType(data,s)
+	      if experimentalFactoryType[s['name']] in ["a_w","a_h"]:
+	        data['%s_up_yield'%s['name']] = '-'
+	        data['%s_down_yield'%s['name']] = '-'
+	      else: data['%s_yield'%s['name']] = '-'
   for s in theory_systematics: 
     if s['type'] == 'factory': 
       theoryFactoryType[s['name']] = factoryType(data,s)
       if theoryFactoryType[s['name']] in ["a_w","a_h"]:
-	data['%s_up_yield'%s['name']] = '-'
-	data['%s_down_yield'%s['name']] = '-'
-	if not opt.skipCOWCorr:
-	  data['%s_up_yield_COWCorr'%s['name']] = '-'
-	  data['%s_down_yield_COWCorr'%s['name']] = '-'
+	      data['%s_up_yield'%s['name']] = '-'
+	      data['%s_down_yield'%s['name']] = '-'
+	      if not opt.skipCOWCorr:
+	        data['%s_up_yield_COWCorr'%s['name']] = '-'
+	        data['%s_down_yield_COWCorr'%s['name']] = '-'
       else: 
-	data['%s_yield'%s['name']] = '-'
-	if not opt.skipCOWCorr: data['%s_yield_COWCorr'%s['name']] = '-'
+	      data['%s_yield'%s['name']] = '-'
+	      if not opt.skipCOWCorr: data['%s_yield_COWCorr'%s['name']] = '-'
 
 # Loop over signal rows in dataFrame: extract yields (nominal & systematic variations)
 totalSignalRows = float(data[data['type']=='sig'].shape[0])
@@ -243,23 +243,23 @@ for ir,r in data[data['type']=='sig'].iterrows():
       # Skip centralObjectWeight correction as concerns events in acceptance
       print("contents",contents)
       experimentalSystYields = calcSystYields(r['nominalDataName'],contents,inputWS,experimentalFactoryType,skipCOWCorr=True,proc=r['proc'],year=r['year'],ignoreWarnings=opt.ignore_warnings)
-      for s,f in experimentalFactoryType.iteritems():
-	if f in ['a_w','a_h']: 
-	  for direction in ['up','down']: 
-	    data.at[ir,"%s_%s_yield"%(s,direction)] = experimentalSystYields["%s_%s"%(s,direction)]
-	else:
-	  data.at[ir,"%s_yield"%s] = experimentalSystYields[s]
+      for s,f in experimentalFactoryType.items():
+	      if f in ['a_w','a_h']: 
+	        for direction in ['up','down']: 
+	          data.at[ir,"%s_%s_yield"%(s,direction)] = experimentalSystYields["%s_%s"%(s,direction)]
+	      else:
+	        data.at[ir,"%s_yield"%s] = experimentalSystYields[s]
 
     # For theoretical systematics:
     theorySystYields = calcSystYields(r['nominalDataName'],contents,inputWS,theoryFactoryType,skipCOWCorr=opt.skipCOWCorr,proc=r['proc'],year=r['year'],ignoreWarnings=opt.ignore_warnings)
-    for s,f in theoryFactoryType.iteritems():
+    for s,f in theoryFactoryType.items():
       if f in ['a_w','a_h']: 
-	for direction in ['up','down']: 
-	  data.at[ir,"%s_%s_yield"%(s,direction)] = theorySystYields["%s_%s"%(s,direction)]
-	  if not opt.skipCOWCorr: data.at[ir,"%s_%s_yield_COWCorr"%(s,direction)] = theorySystYields["%s_%s_COWCorr"%(s,direction)]
+	      for direction in ['up','down']: 
+	        data.at[ir,"%s_%s_yield"%(s,direction)] = theorySystYields["%s_%s"%(s,direction)]
+	      if not opt.skipCOWCorr: data.at[ir,"%s_%s_yield_COWCorr"%(s,direction)] = theorySystYields["%s_%s_COWCorr"%(s,direction)]
       else:
-	data.at[ir,"%s_yield"%s] = theorySystYields[s]
-	if not opt.skipCOWCorr: data.at[ir,"%s_yield_COWCorr"%s] = theorySystYields["%s_COWCorr"%s]
+	      data.at[ir,"%s_yield"%s] = theorySystYields[s]
+	      if not opt.skipCOWCorr: data.at[ir,"%s_yield_COWCorr"%s] = theorySystYields["%s_COWCorr"%s]
 
   # Remove the workspace and file from heap
   inputWS.Delete()
