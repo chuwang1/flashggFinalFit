@@ -75,7 +75,7 @@ def plotFTest(ssfs,_opt=1,_outdir='./',_extension='',_proc='',_cat='',_mass='125
   hists = od()
   hmax, hmin = 0, 0
   # Loop over nGauss fits
-  for k,ssf in ssfs.iteritems():
+  for k,ssf in ssfs.items():
     ssf.MH.setVal(int(_mass))
     hists[k] = ssf.Pdfs['final'].createHistogram("h_%s_%s"%(k,_extension),ssf.xvar,ROOT.RooFit.Binning(1600))
     if int(k.split("_")[-1]) == _opt: hists[k].SetLineWidth(3)
@@ -107,7 +107,7 @@ def plotFTest(ssfs,_opt=1,_outdir='./',_extension='',_proc='',_cat='',_mass='125
   hists['data'].SetMaximum(1.2*hmax)
   hists['data'].SetMinimum(1.2*hmin)
   hists['data'].Draw("PE")
-  for k,h in hists.iteritems():
+  for k,h in hists.items():
     if k == "data": continue
     h.Draw("HIST SAME")
 
@@ -117,7 +117,7 @@ def plotFTest(ssfs,_opt=1,_outdir='./',_extension='',_proc='',_cat='',_mass='125
   leg.SetLineColor(0)
   leg.SetTextSize(0.03)
   leg.AddEntry(hists['data'],"Simulation","ep")
-  for k,ssf in ssfs.iteritems(): 
+  for k,ssf in ssfs.items(): 
     if int(k.split("_")[-1]) == _opt: leg.AddEntry(hists[k],"#bf{N_{gauss} = %s}: #chi^{2}/n(dof) = %.4f"%(k.split("_")[-1],ssf.getReducedChi2()),"L")
     else: leg.AddEntry(hists[k],"N_{gauss} = %s: #chi^{2}/n(dof) = %.4f"%(k.split("_")[-1],ssf.getReducedChi2()),"L")
   leg.Draw("Same")
@@ -141,7 +141,7 @@ def plotFTestResults(ssfs,_opt,_outdir="./",_extension='',_proc='',_cat='',_mass
   p = 0
   xmax = 1
   ymax = -1
-  for k,ssf in ssfs.iteritems():
+  for k,ssf in ssfs.items():
     ssf.MH.setVal(int(_mass))
     x = int(k.split("_")[-1])
     if x > xmax: xmax = x
@@ -236,12 +236,12 @@ def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc=''
   hists['data'].Draw("PE")
   hists['final'].Draw("Same HIST")
   # Individual Gaussian histograms
-  for k,v in ssf.Pdfs.iteritems():
+  for k,v in ssf.Pdfs.items():
     if k == 'final': continue
     pdfs[k] = v
-  if len(pdfs.keys())!=1:
+  if len(list(pdfs.keys()))!=1:
     pdfItr = 0
-    for k,v in pdfs.iteritems():
+    for k,v in pdfs.items():
       if pdfItr == 0:
         if "gaus" in k: frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_g0_constrained")
         else: frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_constrained")
@@ -263,12 +263,12 @@ def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc=''
   leg.AddEntry(hists['data'],"Simulation","ep")
   leg.AddEntry(hists['final'],"Parametric Model","L")
   leg.Draw("Same")
-  if len(pdfs.keys())!=1:
+  if len(list(pdfs.keys()))!=1:
     leg1 = ROOT.TLegend(0.6,0.4,0.86,0.6)
     leg1.SetFillStyle(0)
     leg1.SetLineColor(0)
     leg1.SetTextSize(0.035)
-    for k,v in pdfs.iteritems(): leg1.AddEntry(hists[k],k,"L")
+    for k,v in pdfs.items(): leg1.AddEntry(hists[k],k,"L")
     leg1.Draw("Same")
   # Add Latex
   lat = ROOT.TLatex()
@@ -328,7 +328,9 @@ def plotInterpolation(_finalModel,_outdir='./',_massPoints='120,121,122,123,124,
       hists['data_%s'%mp].SetLineColor(colorMap[mp])
 
   # Extract first hist and clone for axes
-  haxes = hists[hists.keys()[0]].Clone()
+  print(type(hists))
+  print(hists.keys())
+  haxes = hists[list(hists.keys())[0]].Clone()
   # haxes.GetXaxis().SetTitle("m_{#gamma#gamma} [GeV]")
   haxes.GetXaxis().SetTitle("m_{#j#j} [GeV]")
   haxes.GetYaxis().SetTitle("Events / %.2f GeV"%((_finalModel.xvar.getMax()-_finalModel.xvar.getMin())/_finalModel.xvar.getBins()))
@@ -340,7 +342,7 @@ def plotInterpolation(_finalModel,_outdir='./',_massPoints='120,121,122,123,124,
   haxes.Draw("AXIS")
 
   # Draw rest of histograms
-  for k,h in hists.iteritems(): 
+  for k,h in hists.items(): 
     if "data" in k: h.Draw("Same EP")
     else: 
       h.Draw("Same HIST")
@@ -364,7 +366,7 @@ def plotInterpolation(_finalModel,_outdir='./',_massPoints='120,121,122,123,124,
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Plot splines
-def plotSplines(_finalModel,_outdir="./",_nominalMass='125',splinesToPlot=['xs','br','ea','fracRV']):
+def plotSplines(_finalModel,_outdir="./",_nominalMass='125',splinesToPlot=['xs','br','ea']):
   canv = ROOT.TCanvas()
   colorMap = {'xs':ROOT.kRed-4,'br':ROOT.kAzure+1,'ea':ROOT.kGreen+1,'fracRV':ROOT.kMagenta-7,'norm':ROOT.kBlack}
   grs = od()
@@ -415,7 +417,7 @@ def plotSplines(_finalModel,_outdir="./",_nominalMass='125',splinesToPlot=['xs',
   leg.SetLineColor(0)
   leg.SetTextSize(0.04)
   # Draw graphs
-  for x, gr in grs.iteritems(): 
+  for x, gr in grs.items(): 
     gr.SetLineColor(colorMap[x])
     gr.SetMarkerColor(colorMap[x])
     gr.SetMarkerStyle(20)

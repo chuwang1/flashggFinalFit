@@ -353,7 +353,7 @@ class SimultaneousFit:
     fv.remove(self.xvar)
     fv.remove(self.constOne)
     self.FitParameters = ROOT.RooArgList(fv)
-    print(self.FitParameters)
+
     # Create initial vector of parameters and calculate initial Chi2
     if self.verbose: print("\n --> (%s) Initialising fit parameters"%self.name)
     x0 = self.extractX0()

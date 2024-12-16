@@ -340,4 +340,3 @@ if opt.doPlots:
   # Plot interpolation
   plotInterpolation(fm,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext)) 
   plotSplines(fm,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext),_nominalMass=MHNominal) 
-  print("plottt")
