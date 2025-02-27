@@ -13,7 +13,7 @@ def get_options():
 (opt,args) = get_options()
 
 if not os.path.exists( opt.inputDatacard ):
-  print(" --> [ERROR] Input datacard %s does not exist."%opt.inputDatacard)
+  print " --> [ERROR] Input datacard %s does not exist."%opt.inputDatacard
   sys.exit(1)
 
 catLine = ''
