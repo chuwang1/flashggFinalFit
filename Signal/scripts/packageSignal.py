@@ -47,7 +47,6 @@ for mp in opt.massPoints.split(","):
   print('fNames',fNames)
   print('opt.exts.split(",")[0]',opt.exts.split(",")[0])
   print("debug: opt.exts", opt.exts)
-  print(opt.exts.split(",")[0])
   print('fNames[opt.exts.split(",")[0]][0]',fNames[opt.exts.split(",")[0]][0])
   print('fNames[0]')
   print(mp)
@@ -56,7 +55,7 @@ for mp in opt.massPoints.split(","):
   data_merged["m%s"%mp] = ROOT.TFile(fNames[opt.exts.split(",")[0]][0]).Get("wsig_13TeV").data("sig_mass_m%s_%s"%(mp,opt.cat)).emptyClone("sig_mass_m%s_%s"%(mp,opt.cat))
   data_merged_names.append( data_merged["m%s"%mp].GetName() )
 
-for ext, fNames_by_ext in fNames.items():
+for ext, fNames_by_ext in fNames.iteritems():
   for fName in fNames_by_ext:
     for mp in opt.massPoints.split(","):
       d = ROOT.TFile(fName).Get("wsig_13TeV").data("sig_mass_m%s_%s"%(mp,opt.cat))
@@ -65,10 +64,10 @@ for ext, fNames_by_ext in fNames.items():
         w = d.weight()
         data_merged["m%s"%mp].add(p,w)
   
-for _data in data_merged.values(): packagedWS.imp(_data)
+for _data in data_merged.itervalues(): packagedWS.imp(_data)
         
 # Loop over input signal fit workspaces
-for ext, fNames_by_ext in fNames.items():
+for ext, fNames_by_ext in fNames.iteritems():
   for fName in fNames_by_ext:
     fin = ROOT.TFile(fName)
     wsin = fin.Get("wsig_13TeV")
@@ -80,9 +79,9 @@ for ext, fNames_by_ext in fNames.items():
     allData = wsin.allData()
 
     # Import objects into output workspace
-    for _varName, _var in allVars.items(): packagedWS.imp(_var,ROOT.RooFit.RecycleConflictNodes(),ROOT.RooFit.Silence())
-    for _funcName, _func in allFunctions.items(): packagedWS.imp(_func,ROOT.RooFit.RecycleConflictNodes(),ROOT.RooFit.Silence())
-    for _pdfName, _pdf in allPdfs.items(): packagedWS.imp(_pdf,ROOT.RooFit.RecycleConflictNodes(),ROOT.RooFit.Silence())
+    for _varName, _var in allVars.iteritems(): packagedWS.imp(_var,ROOT.RooFit.RecycleConflictNodes(),ROOT.RooFit.Silence())
+    for _funcName, _func in allFunctions.iteritems(): packagedWS.imp(_func,ROOT.RooFit.RecycleConflictNodes(),ROOT.RooFit.Silence())
+    for _pdfName, _pdf in allPdfs.iteritems(): packagedWS.imp(_pdf,ROOT.RooFit.RecycleConflictNodes(),ROOT.RooFit.Silence())
 
     for _data in allData:
       # Skip merged datasets
@@ -92,13 +91,13 @@ for ext, fNames_by_ext in fNames.items():
 # Save to file
 if not os.path.isdir("outdir_%s"%opt.outputExt): os.system("mkdir outdir_%s"%opt.outputExt)
 if opt.mergeYears:
-  print((" --> Writing to: ./outdir_%s/CMS-HGG_sigfit_%s_%s.root")%(opt.outputExt,opt.outputExt,opt.cat))
+  print (" --> Writing to: ./outdir_%s/CMS-HGG_sigfit_%s_%s.root")%(opt.outputExt,opt.outputExt,opt.cat)
   f = ROOT.TFile("./outdir_%s/CMS-HGG_sigfit_%s_%s.root"%(opt.outputExt,opt.outputExt,opt.cat),"RECREATE")
 else:
   print( " --> Writing to: ./outdir_%s/CMS-HGG_sigfit_%s_%s_%s.root")%(opt.outputExt,opt.outputExt,opt.cat,opt.year)
   f = ROOT.TFile("./outdir_%s/CMS-HGG_sigfit_%s_%s_%s.root"%(opt.outputExt,opt.outputExt,opt.cat,opt.year),"RECREATE")
-print("chuw")
+
 packagedWS.Write()
-# packagedWS.Delete()
+packagedWS.Delete()
 f.Delete()
 f.Close()
