@@ -55,7 +55,7 @@ def makeHists(cat=0,meanB=50,meanL=-4.,meanH=4.,errB=50,errL=0.5,errH=1.5,pullB=
   TestFileFound = False
   test_file=0
   TFi = 0
-  print(dir+'/'+list_of_files[TFi])
+  print  dir+'/'+list_of_files[TFi]
   while not TestFileFound:
     test_file = r.TFile.Open(dir+'/'+list_of_files[TFi])
     try :
@@ -77,7 +77,7 @@ def makeHists(cat=0,meanB=50,meanL=-4.,meanH=4.,errB=50,errL=0.5,errH=1.5,pullB=
       truth= key.GetName().split('truth')[1].split('_cat')[0][1:]
     truth_models.add(truth)
 
-  print(truth_models)
+  print truth_models
 
   types = set()
   types.add('Fab')
@@ -125,9 +125,9 @@ def makeHists(cat=0,meanB=50,meanL=-4.,meanH=4.,errB=50,errL=0.5,errH=1.5,pullB=
         graphCovMap[type][mod][c].SetName('%s_mu%sCov%3.1f'%(mod,type,cov))
         counterCovMap[type][mod].append([0,0])
 
-  print(dir)
+  print dir
   for i, f in enumerate(list_of_files):
-    print('\tJob', i+1,'/',len(list_of_files), '\r',)
+    print '\tJob', i+1,'/',len(list_of_files), '\r',
     sys.stdout.flush()
     file = r.TFile.Open(dir+'/'+f)
     try :
@@ -196,7 +196,7 @@ def makeHists(cat=0,meanB=50,meanL=-4.,meanH=4.,errB=50,errL=0.5,errH=1.5,pullB=
         if r.TMath.Abs(pull)<cov:
           counterCovMap[mytype][truth][c][0] += 1
   
-  print('\n',)
+  print '\n',
   outfile.cd()
 
   for type, item in histMap.items():
@@ -271,10 +271,10 @@ else:
     options.expectSignal = float(info[3])
     sw.Reset()
     sw.Start()
-    print('Running file', i, 'of', nfiles)
+    print 'Running file', i, 'of', nfiles
     makeHists(cat,int(info[4]),float(info[5]),float(info[6]),int(info[7]),float(info[8]),float(info[9]),int(info[10]),float(info[11]),float(info[12]))
     sw.Stop()
-    print('Took:', sw.Print())
+    print 'Took:', sw.Print()
     i+=1
   f.close()
     

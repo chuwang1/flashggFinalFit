@@ -41,28 +41,28 @@ for root,dirs,files in os.walk(dir):
  #       run[cat].append(job)
  #     runedscripts.append('%s/%s'%(root,file))
 
-print('Completed jobs:')
+print 'Completed jobs:'
 for key,item in comp.items():
-  print('\t cat', key, ' - ', len(item))
+  print '\t cat', key, ' - ', len(item)
 
-print('Failed jobs:')
+print 'Failed jobs:'
 for key,item in fail.items():
-  print('\t cat', key, ' - ', len(item))
+  print '\t cat', key, ' - ', len(item)
 
-#print('Running jobs:')
+#print 'Running jobs:'
 #for key,item in run.items():
-#  print('\t cat', key, ' - ', len(item))
+#  print '\t cat', key, ' - ', len(item)
 
 if options.resubFailed: 
   for fi in failedscripts:
     os.system('bsub -q %s -o %s.log < ./%s'%(options.queue,fi,fi))
-    #print('bsub -q %s -o %s.log < ./%s'%(options.queue,fi,fi))
-  print("done subbing failures")
+    #print 'bsub -q %s -o %s.log < ./%s'%(options.queue,fi,fi)
+  print "done subbing failures"
 
 #if options.rerun: 
 #  for fi in runedscripts:
 #    os.system('bsub -q %s -o %s.log < ./%s'%(options.queue,fi,fi))
-#  print("done re-subbing running jobs")
+#  print "done re-subbing running jobs"
   
 
 if options.resubFailed: sys.exit("Re-run without --resubFailed to merge jobs")

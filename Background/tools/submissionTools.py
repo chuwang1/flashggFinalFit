@@ -4,7 +4,7 @@ import re
 from commonObjects import *
 
 def run(cmd):
-  print("%s\n\n"%cmd)
+  print "%s\n\n"%cmd
   os.system(cmd)
 
 def writePreamble(_file):
@@ -59,7 +59,7 @@ def writeSubFiles(_opts):
         c = _opts['cats'].split(",")[cidx]
         co = _opts['catOffset']+cidx
         _f.write("if [ $1 -eq %g ]; then\n"%cidx)
-        _cmd = "%s/runBackgroundScripts.sh -i %s -p %s -f %s --ext %s --catOffset %g --intLumi %s --year %s --batch %s --queue %s --sigFile %s --isData --fTest"%(bwd__,_opts['dataFile'],_opts['procs'],c,_opts['ext'],co,_opts['lumi'],_opts['year'],_opts['batch'],_opts['queue'],_opts['signalFitWSFile'])
+        _cmd = "%s/runBackgroundScripts.sh -i %s -p %s -f %s --ext %s --catOffset %g --intLumi %s --year %s --batch %s --queue %s --mass_up % --mass_low %s --sigFile %s --isData --fTest"%(bwd__,_opts['dataFile'],_opts['procs'],c,_opts['ext'],co,_opts['lumi'],_opts['year'],_opts['batch'],_opts['queue'],_opts['mass_up'],_opts['mass_low'],_opts['signalFitWSFile'])
         _f.write("  %s\n"%_cmd)
         _f.write("fi\n")
       
@@ -85,7 +85,7 @@ def writeSubFiles(_opts):
         co = _opts['catOffset']+cidx
         _f = open("%s/%s_%s.sh"%(_jobdir,_executable,c),"w")
         writePreamble(_f)
-        _cmd = "%s/runBackgroundScripts.sh -i %s -p %s -f %s --ext %s --catOffset %g --intLumi %s --year %s --batch %s --queue %s --sigFile %s --isData --fTest"%(bwd__,_opts['dataFile'],_opts['procs'],c,_opts['ext'],co,_opts['lumi'],_opts['year'],_opts['batch'],_opts['queue'],_opts['signalFitWSFile'])
+        _cmd = "%s/runBackgroundScripts.sh -i %s -p %s -f %s --ext %s --catOffset %g --intLumi %s --year %s --batch %s --queue %s --mass_up %s --mass_low %s --sigFile %s --isData --fTest"%(bwd__,_opts['dataFile'],_opts['procs'],c,_opts['ext'],co,_opts['lumi'],_opts['year'],_opts['batch'],_opts['queue'],_opts['mass_up'],_opts['mass_low'],_opts['signalFitWSFile'])
         _f.write("%s\n"%_cmd)
         _f.close()
         os.system("chmod 775 %s/%s_%s.sh"%(_jobdir,_executable,c))
@@ -99,7 +99,7 @@ def submitFiles(_opts):
     _executable = "condor_%s_%s"%(_opts['mode'],_opts['ext'])
     cmdLine = "cd %s; condor_submit %s.sub; cd %s"%(_jobdir,_executable,bwd__)
     run(cmdLine)
-    print("  --> Finished submitting files")
+    print "  --> Finished submitting files"
 
   # SGE
   elif _opts['batch'] in ['IC','SGE']:
@@ -115,7 +115,7 @@ def submitFiles(_opts):
         _subfile = "%s/%s_%s"%(_jobdir,_executable,c)
         cmdLine = "qsub -q hep.q %s -o %s.log -e %s.err %s.sh"%(jobOptsStr,_subfile,_subfile,_subfile)
         run(cmdLine)
-    print("  --> Finished submitting files")
+    print "  --> Finished submitting files"
   
   # Running locally
   elif _opts['batch'] == 'local':
@@ -128,6 +128,6 @@ def submitFiles(_opts):
         _subfile = "%s/%s_%s"%(_jobdir,_executable,c)
         cmdLine = "bash %s.sh"%_subfile
         run(cmdLine)
-    print("  --> Finished running files")
+    print "  --> Finished running files"
 
  

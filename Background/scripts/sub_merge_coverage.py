@@ -40,7 +40,7 @@ def writeSpec(dat,i):
   f.close()
   os.system('chmod +x %s'%f.name)
   if not options.dryRun: os.system('bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name))
-  else: print('bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name))
+  else: print 'bsub -q %s -o %s.log %s'%(options.queue,f.name,f.name)
 
 
 def writeTmpDat(dat):

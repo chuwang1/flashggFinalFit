@@ -35,7 +35,7 @@ for i,fi in enumerate(files):
    if cNum>1000: sys.exit ("Cannot Find Category index in file %s" %fi)
    cat = win.cat("pdfindex_%d_%s"%(cNum,ext))
 
-  print("Merging Category ",cNum)
+  print "Merging Category ",cNum
 
   pdf   = win.pdf("CMS_hgg_cat%d_%s_bkgshape"%(cNum,ext))
   norm  = win.var("CMS_hgg_cat%d_%s_bkgshape_norm"%(cNum,ext))

@@ -25,6 +25,6 @@ for root, dirs, files in os.walk(options.dir):
     my_files = fnmatch.filter(files,options.grep)
     if options.timeLater: time_filter(root,my_files,options.timeLater)
     running_sum += len(my_files)
-    print('%s/%15s -- %d'%(os.path.basename(os.path.abspath(os.path.join(root,os.pardir))),os.path.basename(root),len(my_files)))
+    print '%s/%15s -- %d'%(os.path.basename(os.path.abspath(os.path.join(root,os.pardir))),os.path.basename(root),len(my_files))
 
-print('Total matches =', running_sum)
+print 'Total matches =', running_sum

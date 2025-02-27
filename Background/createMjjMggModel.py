@@ -32,27 +32,33 @@ def get_options():
 cats = opt.cats.split(',')
 input_procs = opt.inp_procs.split(',')
 
-print(opt.inp_dir + opt.inp_file)
+
 
 tfile = ROOT.TFile(opt.inp_file)
+
 tfile_mjj = ROOT.TFile(opt.inp_file_mjj)
+
 ws_mgg = tfile.Get("multipdf")
+
 ws_mjj = tfile_mjj.Get("multipdf")
+
 for num,f in enumerate(input_procs):
   for cat_num,cat in enumerate(cats) : 
   #for cat_num,cat in enumerate([cats[0]]) : 
-    pdf_mjj = "CMS_hgg_%s_13TeV_bkgshape"%(cat)
+    pdf_mjj = "CMS_hjj_%s_13TeV_bkgshape"%(cat)
+  
     pdf_mgg = "CMS_hgg_%s_13TeV_bkgshape"%(cat)
+    
     #ws_mjj.pdf(pdf_mjj).Print("v")
-    print("pdf",pdf_mjj,pdf_mgg)
-    pdfjj=ws_mjj.pdf(pdf_mjj)
-    pdfjj.SetName("CMS_hjj_resolved_cat0_13TeV_bkgshape")
-    getattr(ws_mgg, 'import')(pdfjj,ROOT.RooCmdArg())
-    getattr(ws_mgg, 'import')(ws_mjj.var("Dijet_mass"),ROOT.RooCmdArg())
+    # print("pdf",pdf_mjj,pdf_mgg)
+    # pdfjj=ws_mjj.pdf(pdf_mjj)
+    # pdfjj.SetName("CMS_hjj_resolved_cat0_13TeV_bkgshape")
+    getattr(ws_mgg, 'import')(pdf_mjj,ROOT.RooCmdArg())
+    # getattr(ws_mgg, 'import')(ws_mjj.var("Dijet_mass"),ROOT.RooCmdArg())
     prod_pdf = "CMS_hjjgg_%s_13TeV_bkgshape"%(cat)
-    #print(ws_mgg.pdf(pdf_mgg))
-    #print(ws_mjj.pdf(pdf_mjj))
-    sig_prod_pdf = ROOT.RooProdPdf(prod_pdf,"",ws_mgg.pdf(pdf_mgg),pdfjj)
+    #print ws_mgg.pdf(pdf_mgg)
+    #print ws_mjj.pdf(pdf_mjj)
+    sig_prod_pdf = ROOT.RooProdPdf(prod_pdf,"",ws_mgg.pdf(pdf_mgg),ws_mjj.pdf(pdf_mjj))
     #sig_prod_pdf.Print("v") 
     getattr(ws_mgg, 'import')(sig_prod_pdf,ROOT.RooFit.RecycleConflictNodes())
     #Save normalization for combine
@@ -61,9 +67,9 @@ for num,f in enumerate(input_procs):
     getattr(ws_mgg, 'import')(sig_prod_pdf_norm,ROOT.RooFit.RecycleConflictNodes())
     ##Printing normalization
    # ws_mgg.var("MH").setVal(125.)  #just to check that the normalization is the same for Mgg and Mjj, it is of course.
-  #  print('mgg : ',ws_mgg.function(pdf_mgg+"_norm").getVal(),', mjj : ',ws_mjj.function(pdf_mjj+"_norm").getVal(), ", imported product : ",ws_mgg.function(prod_pdf+"_norm").getVal() #just to check that the normalization is the same for Mgg and Mjj, it is of course.)
+  #  print 'mgg : ',ws_mgg.function(pdf_mgg+"_norm").getVal(),', mjj : ',ws_mjj.function(pdf_mjj+"_norm").getVal(), ", imported product : ",ws_mgg.function(prod_pdf+"_norm").getVal() #just to check that the normalization is the same for Mgg and Mjj, it is of course.
     
  
-f_out = ROOT.TFile.Open(opt.out_dir+"CMS-HGG_multipdf_resolved_cat0_2016_2017_2018_%s_%s.root"%(opt.mass,opt.cats),"RECREATE")
+f_out = ROOT.TFile.Open(opt.out_dir+"CMS-HGG_multipdf_%s.root"%(opt.cats),"RECREATE")
 ws_mgg.Write()
 f_out.Close()

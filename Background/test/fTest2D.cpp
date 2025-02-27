@@ -63,9 +63,9 @@ int mgg_high =180;
 int mjj_low =70;
 int mjj_high =190;
 //int nBinsForMass = 4*(mgg_high-mgg_low);
-int nBinsForMass = 2*(mgg_high-mgg_low);
+int nBinsForMass = (mgg_high-mgg_low)/1.;
 //int nBinsForMass2 = (mjj_high-mjj_low);
-int nBinsForMass2 = (mjj_high-mjj_low);
+int nBinsForMass2 = (mjj_high-mjj_low)/5;
 
 RooRealVar *intLumi_ = new RooRealVar("IntLumi","hacked int lumi", 1000.);
 
