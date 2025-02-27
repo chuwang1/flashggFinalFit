@@ -5,8 +5,8 @@ import re, glob
 import json
 from optparse import OptionParser
 
-from commonTools import *
-from commonObjects import *
+from tools.commonTools import *
+from tools.commonObjects import *
 from tools.plottingTools import *
 
 def get_options():
@@ -100,6 +100,7 @@ for cat,f in inputFiles.items():
   # Iterate over norms: extract total category norm
   catNorm = 0
   for k, norm in norms.items():
+    
     proc, year = k.split("__")
     w.var("IntLumi").setVal(lumiScaleFactor*lumiMap[year])
     catNorm += norm.getVal()

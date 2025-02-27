@@ -5,8 +5,8 @@ from optparse import OptionParser
 from collections import OrderedDict as od
 
 # Import tools from ./tools
-from commonTools import *
-from commonObjects import *
+from tools.commonTools import *
+from tools.commonObjects import *
 from tools.submissionTools import *
 
 def get_options():
@@ -21,7 +21,7 @@ def get_options():
   parser.add_option('--batch', dest='batch', default='condor', help='Batch')
   parser.add_option('--queue', dest='queue', default='espresso', help='Queue: should not take long (microcentury will do)')
   parser.add_option('--jobOpts', dest='jobOpts', default='', help="Additional options to add to job submission. For Condor separate individual options with a colon (specify all within quotes e.g. \"option_xyz = abc+option_123 = 456\")")
-  parser.add_option('--printOnly', dest='printOnly', default=False, action="store_true", help="Dry run: print(submission files only")
+  parser.add_option('--printOnly', dest='printOnly', default=False, action="store_true", help="Dry run: print submission files only")
   return parser.parse_args()
 (opt,args) = get_options()
 

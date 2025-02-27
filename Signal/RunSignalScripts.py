@@ -6,8 +6,8 @@ from optparse import OptionParser
 from collections import OrderedDict as od
 import importlib
 # Import tools from ./tools
-from commonTools import *
-from commonObjects import *
+from tools.commonTools import *
+from tools.commonObjects import *
 from tools.submissionTools import *
 
 def get_options():
@@ -18,7 +18,7 @@ def get_options():
   parser.add_option('--modeOpts', dest='modeOpts', default='', help="Additional options to add to command line when running scripts (specify all within quotes e.g. \"--XYZ ABC\")")
   parser.add_option('--jobOpts', dest='jobOpts', default='', help="Additional options to add to job submission. For Condor separate individual options with a colon (specify all within quotes e.g. \"option_xyz = abc+option_123 = 456\")")
   parser.add_option('--groupSignalFitJobsByCat', dest='groupSignalFitJobsByCat', default=False, action="store_true", help="Option to group signalFit jobs by category")
-  parser.add_option('--printOnly', dest='printOnly', default=False, action="store_true", help="Dry run: print(submission files only")
+  parser.add_option('--printOnly', dest='printOnly', default=False, action="store_true", help="Dry run: print submission files only")
   return parser.parse_args()
 (opt,args) = get_options()
 
@@ -37,7 +37,10 @@ if opt.inputConfig != '':
     # os.system("cp %s config.py"%opt.inputConfig)
     config=opt.inputConfig
     config = os.path.splitext(config)[0]
+    # config = config.split("")
     config=config.replace("/",".")
+    print("fff",config)
+    
     module = importlib.import_module(config)
     # from config import signalScriptCfg
     _cfg = module.signalScriptCfg
@@ -85,7 +88,6 @@ if options['mode'] not in ['fTest','getDiagProc','calcPhotonSyst','signalFit']:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Extract list of filenames
 WSFileNames = extractWSFileNames(options['inputWSDir'])
-print("chuw",WSFileNames)
 if not WSFileNames: leave()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
