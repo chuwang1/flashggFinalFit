@@ -132,11 +132,13 @@ class FinalModel:
     if not self.skipSystematics: self.buildNuisanceMap()
     # Build final pdfs
     if not self.skipVertexScenarioSplit: 
+      
       self.buildRVFracFunction()
       self.buildPdf(self.ssfMap['RV'],ext="rv",useDCB=self.useDCB)
       self.buildPdf(self.ssfMap['WV'],ext="wv",useDCB=self.useDCB)
       self.Pdfs['final'] = ROOT.RooAddPdf("%s_%s"%(outputWSObjectTitle__,self.name),"%s_%s"%(outputWSObjectTitle__,self.name),ROOT.RooArgList(self.Pdfs['rv'],self.Pdfs['wv']),ROOT.RooArgList(self.Functions['fracRV']))
     else:
+      
       self.buildPdf(self.ssfMap['Total'],ext='total',useDCB=self.useDCB)
       self.Pdfs['final'] = self.Pdfs['total']
     # Build final normalisation, datasets and extended Pdfs
@@ -154,14 +156,15 @@ class FinalModel:
     # XS
     if(self.proc == 'gghh'):
       if self.xvar == "CMS_hgg_mass":
-        xs = np.ones(101)
+        xs = np.ones(101)*0.001
       else:
-        xs = np.ones(int(self.MHHigh)-int(self.MHLow))
+        xs = np.ones(int(self.MHHigh)-int(self.MHLow))*0.001
    
     else:
-      mp = self.xsbrMap[self.proc]['mode']
-      fp = self.xsbrMap[self.proc]['factor'] if 'factor' in self.xsbrMap[self.proc] else 1.
-      xs = fp*self.XSBR[mp]
+      # mp = self.xsbrMap[self.proc]['mode']
+      # fp = self.xsbrMap[self.proc]['factor'] if 'factor' in self.xsbrMap[self.proc] else 1.
+      # xs = fp*self.XSBR[mp]
+      xs = np.ones(int(self.MHHigh)-int(self.MHLow))*0.5071
     
     self.Splines['xs'] = ROOT.RooSpline1D("fxs_%s_%s"%(self.proc,self.sqrts),"fxs_%s_%s"%(self.proc,self.sqrts),self.MH,len(mh),mh,xs)
     # BR
@@ -171,9 +174,10 @@ class FinalModel:
       else:
         br = np.ones(int(self.MHHigh)-int(self.MHLow))
     else:
-      md = self.xsbrMap['decay']['mode']
-      fd = self.xsbrMap['decay']['factor'] if 'factor' in self.xsbrMap['decay'] else 1.
-      br = fd*self.XSBR[md]
+      # md = self.xsbrMap['decay']['mode']
+      # fd = self.xsbrMap['decay']['factor'] if 'factor' in self.xsbrMap['decay'] else 1.
+      # br = fd*self.XSBR[md]
+      br = np.ones(int(self.MHHigh)-int(self.MHLow))*0.00227
     self.Splines['br'] = ROOT.RooSpline1D("fbr_%s_%s"%(self.proc,self.sqrts),"fbr_%s_%s"%(self.proc,self.sqrts),self.MH,len(mh),mh,br)
 
   def buildEffAccSpline(self):
@@ -185,7 +189,7 @@ class FinalModel:
       if self.doEffAccFromJson:
         jfname = "%s/outdir_%s/getEffAcc/json/effAcc_M%s_%s.json"%(swd__,self.ext,mp,self.ext)
         if not os.path.exists(jfname):
-          print(" --> [ERROR] effAcc json file (%s) does not exist for mass point = %s. Run getEffAcc first."%(jfname,mp))
+          print " --> [ERROR] effAcc json file (%s) does not exist for mass point = %s. Run getEffAcc first."%(jfname,mp)
           sys.exit(1)
         with open(jfname,'r') as jf: ea_data = json.load(jf)
         ea.append(float(ea_data['%s__%s'%(self.proc,self.cat)]))
@@ -238,20 +242,20 @@ class FinalModel:
     # Extract calcPhotonSyst output
     psname = "%s/outdir_%s/calcPhotonSyst/pkl/%s.pkl"%(swd__,self.ext,self.cat)
     if not os.path.exists(psname):
-      print(" --> [ERROR] Photon systematics do not exist (%s). Please run calcPhotonSyst mode first or skip systematics (--skipSystematics)"%psname)
+      print " --> [ERROR] Photon systematics do not exist (%s). Please run calcPhotonSyst mode first or skip systematics (--skipSystematics)"%psname
       sys.exit(1)
-    with open(psname,"rb") as fpkl: psdata = pickle.load(fpkl)
+    with open(psname,"r") as fpkl: psdata = pickle.load(fpkl)
     
     # Get row for proc: option to use diagonal process
     r = psdata[psdata['proc']==self.procSyst]
     if len(r) == 0:
-      print(" --> [WARNING] Process %s is not in systematics pkl (%s). Skipping systematics."%(self.proc,psname))
+      print " --> [WARNING] Process %s is not in systematics pkl (%s). Skipping systematics."%(self.proc,psname)
       self.skipSystematics = True
 
     else:
       # Add scales, scalesCorr, scalesGlobal, smears
       for sType in ['scales','scalesCorr','scalesGlobal','smears']:
-        for syst in getattr(self,sType).split(","):
+	for syst in getattr(self,sType).split(","):
           if syst == '': continue
 
           # If corr/global nor in sType then build separate nuisance per year i.e. de-correlate
@@ -259,14 +263,14 @@ class FinalModel:
           else: sExt = "_%s"%self.year
 
           # Extract info
-          systOpts = syst.split(":")
-          sName = "%s_%s"%(systOpts[0],outputNuisanceExtMap[sType])
+	  systOpts = syst.split(":")
+	  sName = "%s_%s"%(systOpts[0],outputNuisanceExtMap[sType])
 
           # Extract constant values and make nuisance
           if sType == 'scalesGlobal': cMean, cSigma, cRate = 0.,0.,0.
-          else: cMean, cSigma, cRate = r["%s_mean"%sName].values[0], r["%s_sigma"%sName].values[0], r["%s_rate"%sName].values[0]
-          sOpts = systOpts[1:] if len(systOpts) > 1 else []
-          self.makeNuisance("%s%s"%(sName,sExt),cMean,cSigma,cRate,sType,sOpts)
+	  else: cMean, cSigma, cRate = r["%s_mean"%sName].values[0], r["%s_sigma"%sName].values[0], r["%s_rate"%sName].values[0]
+	  sOpts = systOpts[1:] if len(systOpts) > 1 else []
+	  self.makeNuisance("%s%s"%(sName,sExt),cMean,cSigma,cRate,sType,sOpts)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Function to get RV fraction func
@@ -289,11 +293,14 @@ class FinalModel:
     if len(frv) == 1: frv, mh = [frv[0],frv[0],frv[0]], [float(self.MHLow),mh[0],float(self.MHHigh)]
     # Convert to numpy arrays and make spline
     frv, mh = np.asarray(frv), np.asarray(mh)
+    print("check fracRV before")
     self.Splines['fracRV'] = ROOT.RooSpline1D("%s_%s_rvFracSpline"%(outputWSObjectTitle__,self.name),"%s_%s_rvFracSpline"%(outputWSObjectTitle__,self.name),self.MH,len(mh),mh,frv)
     # Create function: if not skip systematics then add nuisance for RV fraction
     if self.skipSystematics:
+      print("check fracRV")
       self.Functions['fracRV'] = ROOT.RooFormulaVar("%s_%s_rvFrac"%(outputWSObjectTitle__,self.name),"%s_%s_rvFrac"%(outputWSObjectTitle__,self.name),"TMath::Min(@0,1.0)",ROOT.RooArgList(self.Splines['fracRV']))
     else:
+      print("check fracRV other")
       self.NuisanceMap['other'] = od()
       self.makeNuisance('deltafracright',1.,1.,1.,'other')
       self.Functions['fracRV'] = ROOT.RooFormulaVar("%s_%s_rvFrac"%(outputWSObjectTitle__,self.name),"%s_%s_rvFrac"%(outputWSObjectTitle__,self.name),"TMath::Min(@0+@1,1.0)",ROOT.RooArgList(self.Splines['fracRV'],self.NuisanceMap['other']['deltafracright']['param']))
@@ -314,30 +321,32 @@ class FinalModel:
       self.buildMean('dm_dcb_%s'%extStr,skipSystematics=self.skipSystematics)
       self.buildSigma('sigma_dcb_%s'%extStr,skipSystematics=self.skipSystematics)
       # Build DCB pdf
-      self.Pdfs['dcb_%s'%extStr] = ROOT.RooDoubleCBFast("dcb_%s"%extStr,"dcb_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_dcb_%s"%extStr],self.Splines['a1_dcb_%s'%extStr],self.Splines['n1_dcb_%s'%extStr],self.Splines['a2_dcb_%s'%extStr],self.Splines['n2_dcb_%s'%extStr])
-      
+      # self.Pdfs['dcb_%s'%extStr] = ROOT.RooDoubleCBFast("dcb_%s"%extStr,"dcb_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_dcb_%s"%extStr],self.Splines['a1_dcb_%s'%extStr],self.Splines['n1_dcb_%s'%extStr],self.Splines['a2_dcb_%s'%extStr],self.Splines['n2_dcb_%s'%extStr])
+      self.Pdfs['dcb_%s'%extStr] = ROOT.RooDoubleCBFast("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_dcb_%s"%extStr],self.Splines['a1_dcb_%s'%extStr],self.Splines['n1_dcb_%s'%extStr],self.Splines['a2_dcb_%s'%extStr],self.Splines['n2_dcb_%s'%extStr])
       # + Gaussian: shares mean with DCB
-      self.Splines['sigma_gaus_%s'%extStr] = ssf.Splines['sigma_gaus'].Clone()
-      self.Splines['sigma_gaus_%s'%extStr].SetName("sigma_fit_gaus_%s"%extStr)
-      self.buildSigma('sigma_gaus_%s'%extStr,skipSystematics=self.skipSystematics)
-      if self.doVoigtian:
-        self.Pdfs['gaus_%s'%extStr] = ROOT.RooVoigtian("gaus_%s"%extStr,"gaus_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.GammaH,self.Functions["sigma_gaus_%s"%extStr])
-      else:
-        self.Pdfs['gaus_%s'%extStr] = ROOT.RooGaussian("gaus_%s"%extStr,"gaus_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_gaus_%s"%extStr])
+      # self.Splines['sigma_gaus_%s'%extStr] = ssf.Splines['sigma_gaus'].Clone()
+      # self.Splines['sigma_gaus_%s'%extStr].SetName("sigma_fit_gaus_%s"%extStr)
+      # self.buildSigma('sigma_gaus_%s'%extStr,skipSystematics=self.skipSystematics)
+      # if self.doVoigtian:
+      #   self.Pdfs['gaus_%s'%extStr] = ROOT.RooVoigtian("gaus_%s"%extStr,"gaus_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.GammaH,self.Functions["sigma_gaus_%s"%extStr])
+      # else:
+      #   self.Pdfs['gaus_%s'%extStr] = ROOT.RooGaussian("gaus_%s"%extStr,"gaus_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_gaus_%s"%extStr])
 
       # Fraction
-      self.Splines['frac_%s'%extStr] = ssf.Splines['frac_constrained'].Clone()
-      self.Splines['frac_%s'%extStr].SetName("frac_%s"%extStr)
+      # self.Splines['frac_%s'%extStr] = ssf.Splines['frac_constrained'].Clone()
+      # self.Splines['frac_%s'%extStr].SetName("frac_%s"%extStr)
 
       # Define total pdf
-      _pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
-      for pdf in ['dcb','gaus']: _pdfs.add(self.Pdfs['%s_%s'%(pdf,extStr)])
-      _coeffs.add(self.Splines['frac_%s'%extStr])
-      self.Pdfs[ext] = ROOT.RooAddPdf("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),_pdfs,_coeffs,_recursive)
-
+      # _pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
+      # for pdf in ['dcb','gaus']: _pdfs.add(self.Pdfs['%s_%s'%(pdf,extStr)])
+      # _coeffs.add(self.Splines['frac_%s'%extStr])
+      # self.Pdfs[ext] = ROOT.RooAddPdf("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),_pdfs,_coeffs,_recursive)
+      # print("check ext",ext,extStr)
+      self.Pdfs[ext] = self.Pdfs['dcb_%s'%extStr]
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    else:
     # For nGaussians:
+    else:
+      # For total pdf
       _pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
 
       for g in range(0,ssf.nGaussians):
@@ -362,8 +371,8 @@ class FinalModel:
           self.Splines['frac_g%g_%s'%(g,extStr)].SetName("frac_g%g_%s"%(g,extStr))
           _coeffs.add(self.Splines['frac_g%g_%s'%(g,extStr)])
 
-      # Define total pdf
-      self.Pdfs[ext] = ROOT.RooAddPdf("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),_pdfs,_coeffs,_recursive)
+        # Define total pdf
+        self.Pdfs[ext] = ROOT.RooAddPdf("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),_pdfs,_coeffs,_recursive)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Functions to build mean, sigma and rate functions with systematics
@@ -379,7 +388,7 @@ class FinalModel:
       formula += "*(1."
       # Global
       if 'scalesGlobal' in self.NuisanceMap:
-        for sName, sInfo in self.NuisanceMap['scalesGlobal'].items():
+        for sName, sInfo in self.NuisanceMap['scalesGlobal'].iteritems():
           formula += "+@%g"%dependents.getSize()
           # For adding additional factor
           for so in sInfo['opts']: 
@@ -390,7 +399,7 @@ class FinalModel:
       # Other systs: scales, scalesCorr, smears
       for sType in ['scales','scalesCorr','smears']:
         if sType in self.NuisanceMap:
-          for sName, sInfo in self.NuisanceMap[sType].items():
+          for sName, sInfo in self.NuisanceMap[sType].iteritems():
             c = sInfo['meanConst'].getVal()
             if abs(c)>=5.e-5:
               formula += "+@%g*@%g"%(dependents.getSize(),dependents.getSize()+1)
@@ -410,7 +419,7 @@ class FinalModel:
       formula += "*TMath::Max(1.e-2,(1."
       for sType in ['scales','scalesCorr','smears']:
         if sType in self.NuisanceMap:
-          for sName, sInfo in self.NuisanceMap[sType].items():
+          for sName, sInfo in self.NuisanceMap[sType].iteritems():
             c = sInfo['sigmaConst'].getVal()
             if c>=1e-4:
               formula += "+@%g*@%g"%(dependents.getSize(),dependents.getSize()+1)
@@ -427,7 +436,7 @@ class FinalModel:
       # Add systematics
       for sType in ['scales','scalesCorr','smears']:
         if sType in self.NuisanceMap:
-          for sName, sInfo in self.NuisanceMap[sType].items():
+          for sName, sInfo in self.NuisanceMap[sType].iteritems():
             c = sInfo['rateConst'].getVal()
             if c>=5.e-4:
               formula += "+@%g*@%g"%(dependents.getSize(),dependents.getSize()+1)
@@ -439,7 +448,7 @@ class FinalModel:
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Function to build datasets to add to workspace
   def buildDatasets(self):
-    for mp, d in self.datasets.items(): 
+    for mp, d in self.datasets.iteritems(): 
       self.Datasets[mp] = d.Clone("sig_mass_m%s_%s"%(mp,self.name))
       self.Datasets['%s_copy'%mp] = d.Clone("sig_mass_m%s_%s"%(mp,self.cat))
 
@@ -460,4 +469,4 @@ class FinalModel:
     wsout.imp(self.Functions['final_normThisLumi'],ROOT.RooFit.RecycleConflictNodes())
     wsout.imp(self.Pdfs['final_extend'],ROOT.RooFit.RecycleConflictNodes())
     wsout.imp(self.Pdfs['final_extendThisLumi'],ROOT.RooFit.RecycleConflictNodes())
-    for d in self.Datasets.values(): wsout.imp(d) 
+    for d in self.Datasets.itervalues(): wsout.imp(d) 

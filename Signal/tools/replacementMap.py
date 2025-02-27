@@ -120,6 +120,9 @@ globalReplacementMap["STXS"]["procRVMap"]["RECO_WH_LEP_PTV_75_150_Tag1"] = "QQ2H
 globalReplacementMap["STXS"]["procRVMap"]["RECO_WH_LEP_PTV_GT150_Tag0"] = "QQ2HLNU_PTV_150_250_0J"
 globalReplacementMap["STXS"]["procRVMap"]["RECO_ZH_LEP_Tag0"] = "QQ2HLL_PTV_0_75"
 globalReplacementMap["STXS"]["procRVMap"]["RECO_ZH_LEP_Tag1"] = "QQ2HLL_PTV_0_75"
+globalReplacementMap["STXS"]["procRVMap"]["boosted_cat0"] = "ggH"
+globalReplacementMap["STXS"]["procRVMap"]["boosted_cat1"] = "ggH"
+globalReplacementMap["STXS"]["procRVMap"]["boosted_cat2"] = "ggH"
 # Replacement category for RV fit
 globalReplacementMap["STXS"]["catRVMap"] = od()
 globalReplacementMap["STXS"]["catRVMap"]["RECO_0J_PTH_0_10_Tag0"] = "RECO_0J_PTH_0_10_Tag0"
@@ -206,3 +209,6 @@ globalReplacementMap["STXS"]["catRVMap"]["RECO_WH_LEP_PTV_75_150_Tag1"] = "RECO_
 globalReplacementMap["STXS"]["catRVMap"]["RECO_WH_LEP_PTV_GT150_Tag0"] = "RECO_WH_LEP_PTV_GT150_Tag0"
 globalReplacementMap["STXS"]["catRVMap"]["RECO_ZH_LEP_Tag0"] = "RECO_ZH_LEP_Tag0"
 globalReplacementMap["STXS"]["catRVMap"]["RECO_ZH_LEP_Tag1"] = "RECO_ZH_LEP_Tag1"
+globalReplacementMap["STXS"]["catRVMap"]["boosted_cat0"] = "boosted_cat0"
+globalReplacementMap["STXS"]["catRVMap"]["boosted_cat1"] = "boosted_cat1"
+globalReplacementMap["STXS"]["catRVMap"]["boosted_cat2"] = "boosted_cat2"
