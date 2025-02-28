@@ -24,6 +24,7 @@ def get_options():
   parser = OptionParser()
   parser.add_option("--xvar", dest='xvar', default='CMS_hgg_mass', help="Observable")
   parser.add_option("--cat", dest='cat', default='', help="RECO category")
+  parser.add_option("--mass", dest='mass', default=125, help="mass")
   parser.add_option("--procs", dest='procs', default='', help="Signal processes")
   parser.add_option("--ext", dest='ext', default='', help="Extension")
   parser.add_option("--inputWSDir", dest='inputWSDir', default='', help="Input flashgg WS directory")
@@ -39,7 +40,8 @@ def get_options():
 (opt,args) = get_options()
 
 # RooRealVar to fill histograms
-mgg = ROOT.RooRealVar(opt.xvar,opt.xvar,125)
+# mgg = ROOT.RooRealVar(opt.xvar,opt.xvar,125)
+mgg = ROOT.RooRealVar(opt.xvar,opt.xvar,opt.mass)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Function to extact histograms from WS

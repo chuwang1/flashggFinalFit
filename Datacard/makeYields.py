@@ -12,7 +12,7 @@ import glob
 import pickle
 import math
 from collections import OrderedDict
-from systematics import theory_systematics, experimental_systematics, signal_shape_systematics
+from systematics import theory_systematics, experimental_systematics_boost,experimental_systematics, signal_shape_systematics
 
 from commonObjects import *
 from commonTools import *
@@ -41,6 +41,7 @@ def get_options():
   parser.add_option('--skipCOWCorr', dest='skipCOWCorr', default=False, action="store_true", help="Skip centralObjectWeight correction for events in acceptance. Use if no centralObjectWeight in workspace")
   # For systematics:
   parser.add_option('--doSystematics', dest='doSystematics', default=False, action="store_true", help="Include systematics calculations and add to datacard")
+  parser.add_option('--do2DFits', dest='do2DFits', default=True, action="store_true", help="Include systematics calculations and add to datacard")
   parser.add_option('--ignore-warnings', dest='ignore_warnings', default=False, action="store_true", help="Skip errors for missing systematics. Instead output warning message")
   return parser.parse_args()
 (opt,args) = get_options()
@@ -97,6 +98,7 @@ for year in years:
     else: _cat = "%s_%s"%(opt.cat,year)
 
     # Input flashgg ws 
+    print("%s/*M%s*_%s.root"%(inputWSDirMap[year],opt.mass,proc))
     _inputWSFile = glob.glob("%s/*M%s*_%s.root"%(inputWSDirMap[year],opt.mass,proc))[0]
     _nominalDataName = "%s_%s_%s_%s"%(_proc_s0,opt.mass,sqrts__,opt.cat)
 
@@ -114,8 +116,12 @@ for year in years:
     # Input model ws 
     if opt.cat == "NOTAG": _modelWSFile, _model = '-', '-'
     else:
-      _modelWSFile = "%s/CMS-HGG_sigfit_%s_%s.root"%(opt.sigModelWSDir,opt.sigModelExt,_cat)
-      _model = "%s_%s:%s_%s"%(outputWSName__,sqrts__,outputWSObjectTitle__,_id)
+	#   _modelWSFile = "%s/CMS-HGG_sigfit_%s_%s.root"%(opt.sigModelWSDir,opt.sigModelExt,_cat)
+      _modelWSFile = "%s/CMS-HGG_sigfit_%s_%s_%s.root"%(opt.sigModelWSDir,opt.sigModelExt,_cat,proc)
+      if(opt.do2DFits):
+      	_model = "%s_%s:%s_%s"%(outputWSName__,sqrts__,output2DWSObjectTitle__,_id)
+      else:
+      	_model = "%s_%s:%s_%s"%(outputWSName__,sqrts__,outputWSObjectTitle__,_id)
 
     # Extract rate from lumi
     _rate = float(lumiMap[year])*1000
@@ -132,14 +138,28 @@ if( not opt.skipBkg)&( opt.cat != "NOTAG" ):
     _cat = opt.cat
     _modelWSFile = "%s/CMS-HGG_%s_%s.root"%(opt.bkgModelWSDir,opt.bkgModelExt,_cat)
     _model_bkg = "%s:CMS_%s_%s_%s_bkgshape"%(bkgWSName__,decayMode,_cat,sqrts__)
-    _model_data = "%s:roohist_data_mass_%s"%(bkgWSName__,_cat)
+    if(opt.do2DFits):
+	    _model_data = "%s:Data_13TeV_%s"%(bkgWSName__,_cat)##2D fit
+    else:
+        _model_data = "%s:roohist_data_mass_%s"%(bkgWSName__,_cat)
+
+
     _proc_s0 = '-' #not needed for data/bkg
     _inputWSFile = '-' #not needed for data/bkg
     _nominalDataName = '-' #not needed for data/bkg
+	
     print(" --> Adding to dataFrame: (proc,cat) = (%s,%s)"%(_proc_bkg,_cat))
     print(" --> Adding to dataFrame: (proc,cat) = (%s,%s)"%(_proc_data,_cat))
-    data.loc[len(data)] = ["merged",'bkg',_proc_bkg,_proc_bkg,'-',_cat,_inputWSFile,_nominalDataName,_modelWSFile,_model_bkg,opt.bkgScaler]
-    data.loc[len(data)] = ["merged",'data',_proc_data,_proc_data,'-',_cat,_inputWSFile,_nominalDataName,_modelWSFile,_model_data,-1]
+
+    if(opt.do2DFits):
+        # datafile=opt.bkgModelWSDir+"/allData.root"
+        # modelname="Data_13TeV_%s"%(_cat)
+        print(_modelWSFile)
+        data.loc[len(data)] = ["merged",'bkg',_proc_bkg,_proc_bkg,'-',_cat,_inputWSFile,_nominalDataName,_modelWSFile,_model_bkg,opt.bkgScaler]
+        data.loc[len(data)] = ["merged",'data',_proc_data,_proc_data,'-',_cat,_inputWSFile,_nominalDataName,_modelWSFile,_model_data,-1] ##2D fit
+    else:
+        data.loc[len(data)] = ["merged",'bkg',_proc_bkg,_proc_bkg,'-',_cat,_inputWSFile,_nominalDataName,_modelWSFile,_model_bkg,opt.bkgScaler]
+        data.loc[len(data)] = ["merged",'data',_proc_data,_proc_data,'-',_cat,_inputWSFile,_nominalDataName,_modelWSFile,_model_data,-1]
 
   # Category separate per year
   else:
@@ -175,32 +195,60 @@ if opt.doSystematics:
   #  * a_h: anti-symmetric RooDataHist (2 columns in dataframe)
   #  * a_w: anti-symmetric weight in nominal RooDataSet (2 columns in dataframe)
   #  * s_w: symmetric (single) weight in nominal RooDataSet (1 column in dataframe)
-  experimentalFactoryType = {}
-  theoryFactoryType = {}
-  # No experimental systematics for NOTAG
-  if opt.cat != "NOTAG":
-    for s in experimental_systematics: 
-      print(s)
+  if "boost" in opt.ext:
+    experimentalFactoryType = {}
+    theoryFactoryType = {}
+    # No experimental systematics for NOTAG
+    if opt.cat != "NOTAG":
+      for s in experimental_systematics_boost: 
+        print(s)
+        if s['type'] == 'factory': 
+    # Fix for HEM as only in 2018 workspaces
+          if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
+          else: experimentalFactoryType[s['name']] = factoryType(data,s)
+          if experimentalFactoryType[s['name']] in ["a_w","a_h"]:
+            data['%s_up_yield'%s['name']] = '-'
+            data['%s_down_yield'%s['name']] = '-'
+          else: data['%s_yield'%s['name']] = '-'
+    for s in theory_systematics: 
       if s['type'] == 'factory': 
-	      # Fix for HEM as only in 2018 workspaces
-	      if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
-	      else: experimentalFactoryType[s['name']] = factoryType(data,s)
-	      if experimentalFactoryType[s['name']] in ["a_w","a_h"]:
-	        data['%s_up_yield'%s['name']] = '-'
-	        data['%s_down_yield'%s['name']] = '-'
-	      else: data['%s_yield'%s['name']] = '-'
-  for s in theory_systematics: 
-    if s['type'] == 'factory': 
-      theoryFactoryType[s['name']] = factoryType(data,s)
-      if theoryFactoryType[s['name']] in ["a_w","a_h"]:
-	      data['%s_up_yield'%s['name']] = '-'
-	      data['%s_down_yield'%s['name']] = '-'
-	      if not opt.skipCOWCorr:
-	        data['%s_up_yield_COWCorr'%s['name']] = '-'
-	        data['%s_down_yield_COWCorr'%s['name']] = '-'
-      else: 
-	      data['%s_yield'%s['name']] = '-'
-	      if not opt.skipCOWCorr: data['%s_yield_COWCorr'%s['name']] = '-'
+        theoryFactoryType[s['name']] = factoryType(data,s)
+        if theoryFactoryType[s['name']] in ["a_w","a_h"]:
+          data['%s_up_yield'%s['name']] = '-'
+          data['%s_down_yield'%s['name']] = '-'
+          if not opt.skipCOWCorr:
+            data['%s_up_yield_COWCorr'%s['name']] = '-'
+            data['%s_down_yield_COWCorr'%s['name']] = '-'
+        else: 
+          data['%s_yield'%s['name']] = '-'
+          if not opt.skipCOWCorr: data['%s_yield_COWCorr'%s['name']] = '-'
+  else:
+    experimentalFactoryType = {}
+    theoryFactoryType = {}
+    # No experimental systematics for NOTAG
+    if opt.cat != "NOTAG":
+      for s in experimental_systematics: 
+        print(s)
+        if s['type'] == 'factory': 
+    # Fix for HEM as only in 2018 workspaces
+          if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
+          else: experimentalFactoryType[s['name']] = factoryType(data,s)
+          if experimentalFactoryType[s['name']] in ["a_w","a_h"]:
+            data['%s_up_yield'%s['name']] = '-'
+            data['%s_down_yield'%s['name']] = '-'
+          else: data['%s_yield'%s['name']] = '-'
+    for s in theory_systematics: 
+      if s['type'] == 'factory': 
+        theoryFactoryType[s['name']] = factoryType(data,s)
+        if theoryFactoryType[s['name']] in ["a_w","a_h"]:
+          data['%s_up_yield'%s['name']] = '-'
+          data['%s_down_yield'%s['name']] = '-'
+          if not opt.skipCOWCorr:
+            data['%s_up_yield_COWCorr'%s['name']] = '-'
+            data['%s_down_yield_COWCorr'%s['name']] = '-'
+        else: 
+          data['%s_yield'%s['name']] = '-'
+          if not opt.skipCOWCorr: data['%s_yield_COWCorr'%s['name']] = '-'
 
 # Loop over signal rows in dataFrame: extract yields (nominal & systematic variations)
 totalSignalRows = float(data[data['type']=='sig'].shape[0])

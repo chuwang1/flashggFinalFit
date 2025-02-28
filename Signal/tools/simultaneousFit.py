@@ -15,7 +15,7 @@ pLUT['Gaussian_wdcb'] = od()
 pLUT['Gaussian_wdcb']['dm_p0'] = [0.0,-100,100]
 pLUT['Gaussian_wdcb']['dm_p1'] = [0.01,-0.01,0.01]
 pLUT['Gaussian_wdcb']['dm_p2'] = [0.01,-0.01,0.01]
-pLUT['Gaussian_wdcb']['sigma_p0'] = [15,1.0,100.]
+pLUT['Gaussian_wdcb']['sigma_p0'] = [40,1.0,100.]
 pLUT['Gaussian_wdcb']['sigma_p1'] = [0.0,-0.1,0.1]
 pLUT['Gaussian_wdcb']['sigma_p2'] = [0.0,-0.001,0.001]
 pLUT['Frac'] = od()
@@ -131,7 +131,11 @@ def nChi2Addition(X,ssf,verbose=False):
     
     MHLow=int(ssf.MHLow)
     MHHigh=int(ssf.MHHigh)
-    chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh])
+    # chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh])
+	if ssf.MY.getVal() == 125:
+      chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose)
+    else:
+      chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh]) ##2d
     chi2sum += chi2
     K += k
   # N degrees of freedom
@@ -230,19 +234,19 @@ class SimultaneousFit:
     pLUT['DCB']['dm_p0'] = [self.jetmass,float(self.MHLow),float(self.MHHigh)]
     pLUT['DCB']['dm_p1'] = [0.0,-10,10]
     pLUT['DCB']['dm_p2'] = [0.0,-0.1,0.1]
-    pLUT['DCB']['sigma_p0'] = [13,0.0,100.]
+    pLUT['DCB']['sigma_p0'] = [20,0.0,100.]
     pLUT['DCB']['sigma_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['sigma_p2'] = [0.0,-0.001,0.001]
     pLUT['DCB']['n1_p0'] = [35.,0.01,1000.]
     pLUT['DCB']['n1_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['n1_p2'] = [0.0,-0.001,0.001]
-    pLUT['DCB']['n2_p0'] = [5.6,0.01,500]
+    pLUT['DCB']['n2_p0'] = [4.5,0.01,500]
     pLUT['DCB']['n2_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['n2_p2'] = [0.0,-0.001,0.001]
-    pLUT['DCB']['a1_p0'] = [0.65,0.01,100]
+    pLUT['DCB']['a1_p0'] = [0.11,0.01,100]
     pLUT['DCB']['a1_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['a1_p2'] = [0.0,-0.001,0.001]
-    pLUT['DCB']['a2_p0'] = [1.2,0.01,100]
+    pLUT['DCB']['a2_p0'] = [0.11,0.01,100]
     pLUT['DCB']['a2_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['a2_p2'] = [0.0,-0.001,0.001]
     # Define polynominal functions (in dMH)
@@ -272,26 +276,27 @@ class SimultaneousFit:
     # Define polynomial
     self.Polynomials[k] = ROOT.RooPolyVar(k,k,self.constOne,self.Varlists[k])
     # Build Gaussian
-    self.Pdfs['gaus'] = ROOT.RooGaussian("gaus","gaus",self.xvar,self.Polynomials['mean_dcb'],self.Polynomials['sigma_gaus'])
+    #self.Pdfs['gaus'] = ROOT.RooGaussian("gaus","gaus",self.xvar,self.Polynomials['mean_dcb'],self.Polynomials['sigma_gaus'])
     
         
     # Relative fraction: also polynomial of order MHPolyOrder
-    self.Varlists['frac'] = ROOT.RooArgList("frac_coeffs")
-    for po in range(0,self.MHPolyOrder+1):
-      self.Vars['frac_p%g'%po] = ROOT.RooRealVar("frac_p%g"%po,"frac_p%g"%po,pLUT['Frac']['p%g'%po][0],pLUT['Frac']['p%g'%po][1],pLUT['Frac']['p%g'%po][2])
-      self.Varlists['frac'].add( self.Vars['frac_p%g'%po] )
+    #self.Varlists['frac'] = ROOT.RooArgList("frac_coeffs")
+    #for po in range(0,self.MHPolyOrder+1):
+      #self.Vars['frac_p%g'%po] = ROOT.RooRealVar("frac_p%g"%po,"frac_p%g"%po,pLUT['Frac']['p%g'%po][0],pLUT['Frac']['p%g'%po][1],pLUT['Frac']['p%g'%po][2])
+      #self.Varlists['frac'].add( self.Vars['frac_p%g'%po] )
     # Define Polynomial
-    self.Polynomials['frac'] = ROOT.RooPolyVar('frac','frac',self.dMH,self.Varlists['frac'])
+    #self.Polynomials['frac'] = ROOT.RooPolyVar('frac','frac',self.dMH,self.Varlists['frac'])
     # Constrain fraction to not be above 1 or below 0
-    self.Polynomials['frac_constrained'] = ROOT.RooFormulaVar("frac_constrained","frac_constrained","(@0>0)*(@0<1)*@0+(@0>1.0)*0.9999",ROOT.RooArgList(self.Polynomials['frac']))
-    self.Coeffs['frac_constrained'] = self.Polynomials['frac_constrained' ]
+    #self.Polynomials['frac_constrained'] = ROOT.RooFormulaVar("frac_constrained","frac_constrained","(@0>0)*(@0<1)*@0+(@0>1.0)*0.9999",ROOT.RooArgList(self.Polynomials['frac']))
+    #self.Coeffs['frac_constrained'] = self.Polynomials['frac_constrained' ]
 
     # Define total PDF
-    _pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
-    for pdf in ['dcb','gaus']: _pdfs.add(self.Pdfs[pdf])
-    _coeffs.add(self.Coeffs['frac_constrained'])
+    #_pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
+    #for pdf in ['dcb','gaus']: _pdfs.add(self.Pdfs[pdf])
+    #_coeffs.add(self.Coeffs['frac_constrained'])
     # self.Pdfs['final']=self.Pdfs['dcb']
-    self.Pdfs['final'] = ROOT.RooAddPdf("%s_%s"%(self.proc,self.cat),"%s_%s"%(self.proc,self.cat),_pdfs,_coeffs,_recursive)
+    # self.Pdfs['final'] = ROOT.RooAddPdf("%s_%s"%(self.proc,self.cat),"%s_%s"%(self.proc,self.cat),_pdfs,_coeffs,_recursive)
+    self.Pdfs['final'] = self.Pdfs['dcb']
     # self.Pdfs['final'] = ROOT.RooFFTConvPdf("%s_%s"%(self.proc,self.cat),"%s_%s"%(self.proc,self.cat),self.xvar,self.Pdfs['dcb'],self.Pdfs['gaus'])
   
     

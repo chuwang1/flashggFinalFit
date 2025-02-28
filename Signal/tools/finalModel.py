@@ -154,15 +154,17 @@ class FinalModel:
     # XS
     if(self.proc == 'gghh'):
       if self.xvar == "CMS_hgg_mass":
-        xs = np.ones(101)
+        xs = np.ones(101)*0.001
       else:
-        xs = np.ones(int(self.MHHigh)-int(self.MHLow))
+        xs = np.ones(int(self.MHHigh)-int(self.MHLow))*0.001
    
     else:
-      mp = self.xsbrMap[self.proc]['mode']
-      fp = self.xsbrMap[self.proc]['factor'] if 'factor' in self.xsbrMap[self.proc] else 1.
-      xs = fp*self.XSBR[mp]
-    
+      if self.xvar == "CMS_hgg_mass":
+        mp = self.xsbrMap[self.proc]['mode']
+        fp = self.xsbrMap[self.proc]['factor'] if 'factor' in self.xsbrMap[self.proc] else 1.
+        xs = fp*self.XSBR[mp]
+      else:
+        xs = np.ones(int(self.MHHigh)-int(self.MHLow))*0.5071  
     self.Splines['xs'] = ROOT.RooSpline1D("fxs_%s_%s"%(self.proc,self.sqrts),"fxs_%s_%s"%(self.proc,self.sqrts),self.MH,len(mh),mh,xs)
     # BR
     if(self.proc == 'gghh'):
@@ -171,9 +173,12 @@ class FinalModel:
       else:
         br = np.ones(int(self.MHHigh)-int(self.MHLow))
     else:
-      md = self.xsbrMap['decay']['mode']
-      fd = self.xsbrMap['decay']['factor'] if 'factor' in self.xsbrMap['decay'] else 1.
-      br = fd*self.XSBR[md]
+      if self.xvar == "CMS_hgg_mass":
+        md = self.xsbrMap['decay']['mode']
+        fd = self.xsbrMap['decay']['factor'] if 'factor' in self.xsbrMap['decay'] else 1.
+        br = fd*self.XSBR[md]
+      else:
+        br = np.ones(int(self.MHHigh)-int(self.MHLow))*0.00227
     self.Splines['br'] = ROOT.RooSpline1D("fbr_%s_%s"%(self.proc,self.sqrts),"fbr_%s_%s"%(self.proc,self.sqrts),self.MH,len(mh),mh,br)
 
   def buildEffAccSpline(self):
@@ -314,7 +319,8 @@ class FinalModel:
       self.buildMean('dm_dcb_%s'%extStr,skipSystematics=self.skipSystematics)
       self.buildSigma('sigma_dcb_%s'%extStr,skipSystematics=self.skipSystematics)
       # Build DCB pdf
-      self.Pdfs['dcb_%s'%extStr] = ROOT.RooDoubleCBFast("dcb_%s"%extStr,"dcb_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_dcb_%s"%extStr],self.Splines['a1_dcb_%s'%extStr],self.Splines['n1_dcb_%s'%extStr],self.Splines['a2_dcb_%s'%extStr],self.Splines['n2_dcb_%s'%extStr])
+    #   self.Pdfs['dcb_%s'%extStr] = ROOT.RooDoubleCBFast("dcb_%s"%extStr,"dcb_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_dcb_%s"%extStr],self.Splines['a1_dcb_%s'%extStr],self.Splines['n1_dcb_%s'%extStr],self.Splines['a2_dcb_%s'%extStr],self.Splines['n2_dcb_%s'%extStr])
+      self.Pdfs['dcb_%s'%extStr] = ROOT.RooDoubleCBFast("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_dcb_%s"%extStr],self.Splines['a1_dcb_%s'%extStr],self.Splines['n1_dcb_%s'%extStr],self.Splines['a2_dcb_%s'%extStr],self.Splines['n2_dcb_%s'%extStr])
       
       # + Gaussian: shares mean with DCB
       self.Splines['sigma_gaus_%s'%extStr] = ssf.Splines['sigma_gaus'].Clone()
@@ -326,14 +332,15 @@ class FinalModel:
         self.Pdfs['gaus_%s'%extStr] = ROOT.RooGaussian("gaus_%s"%extStr,"gaus_%s"%extStr,self.xvar,self.Functions["mean_dcb_%s"%extStr],self.Functions["sigma_gaus_%s"%extStr])
 
       # Fraction
-      self.Splines['frac_%s'%extStr] = ssf.Splines['frac_constrained'].Clone()
-      self.Splines['frac_%s'%extStr].SetName("frac_%s"%extStr)
+    #   self.Splines['frac_%s'%extStr] = ssf.Splines['frac_constrained'].Clone()
+    #   self.Splines['frac_%s'%extStr].SetName("frac_%s"%extStr)
 
       # Define total pdf
-      _pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
-      for pdf in ['dcb','gaus']: _pdfs.add(self.Pdfs['%s_%s'%(pdf,extStr)])
-      _coeffs.add(self.Splines['frac_%s'%extStr])
-      self.Pdfs[ext] = ROOT.RooAddPdf("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),_pdfs,_coeffs,_recursive)
+    #   _pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
+    #   for pdf in ['dcb','gaus']: _pdfs.add(self.Pdfs['%s_%s'%(pdf,extStr)])
+    #   _coeffs.add(self.Splines['frac_%s'%extStr])
+    #   self.Pdfs[ext] = ROOT.RooAddPdf("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),_pdfs,_coeffs,_recursive)
+      self.Pdfs[ext] = self.Pdfs['dcb_%s'%extStr]
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     else:
@@ -364,6 +371,7 @@ class FinalModel:
 
       # Define total pdf
       self.Pdfs[ext] = ROOT.RooAddPdf("%s_%s"%(outputWSObjectTitle__,extStr),"%s_%s"%(outputWSObjectTitle__,extStr),_pdfs,_coeffs,_recursive)
+
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Functions to build mean, sigma and rate functions with systematics

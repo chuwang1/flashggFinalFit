@@ -9,7 +9,7 @@ import pandas as pd
 import glob
 import pickle
 from collections import OrderedDict as od
-from systematics import theory_systematics, experimental_systematics, signal_shape_systematics
+from systematics import theory_systematics, experimental_systematics,experimental_systematics_boost, signal_shape_systematics
 
 def get_options():
   parser = OptionParser()
@@ -68,12 +68,20 @@ if opt.doSystematics:
   experimentalFactoryType = {}
   theoryFactoryType = {}
   mask = (~data['cat'].str.contains("NOTAG"))&(data['type']=='sig')
-  for s in experimental_systematics:
-    if s['type'] == 'factory': 
-      # Fix for HEM as only in 2018 workspaces
-      if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
-      else: 
-        experimentalFactoryType[s['name']] = factoryType(data[mask],s)
+  if "boost" in opt.ext:
+    for s in experimental_systematics_boost:
+      if s['type'] == 'factory': 
+        # Fix for HEM as only in 2018 workspaces
+        if s['name'] == 'JetHEM' or s['name'] == 'FJHEM': experimentalFactoryType[s['name']] = "a_h"
+        else: 
+          experimentalFactoryType[s['name']] = factoryType(data[mask],s)
+  else:
+    for s in experimental_systematics:
+      if s['type'] == 'factory': 
+        # Fix for HEM as only in 2018 workspaces
+        if s['name'] == 'JetHEM' or s['name'] == 'FJHEM': experimentalFactoryType[s['name']] = "a_h"
+        else: 
+          experimentalFactoryType[s['name']] = factoryType(data[mask],s)
   for s in theory_systematics:
     if s['type'] == 'factory': 
       theoryFactoryType[s['name']] = factoryType(data[mask],s)
@@ -81,8 +89,14 @@ if opt.doSystematics:
   # Experimental:
   print(" --> Adding experimental systematics variations to dataFrame")
   # Add constant systematics to dataFrame
-  for s in experimental_systematics:
-    if s['type'] == 'constant': data = addConstantSyst(data,s,opt)
+  if "boost" in opt.ext:
+    for s in experimental_systematics_boost:
+      if s['type'] == 'constant': data = addConstantSyst(data,s,opt)
+    data = experimentalSystFactory(data, experimental_systematics_boost, experimentalFactoryType, opt )
+  else:
+    for s in experimental_systematics:
+      if s['type'] == 'constant': data = addConstantSyst(data,s,opt)
+    data = experimentalSystFactory(data, experimental_systematics, experimentalFactoryType, opt )
   data = experimentalSystFactory(data, experimental_systematics, experimentalFactoryType, opt )
 
   # Theory:
@@ -144,6 +158,10 @@ if opt.prune:
     
     # Set prune = 1 if < threshold of total cat yield
     # mask = (data['nominal_yield']<opt.pruneThreshold*data.apply(lambda x: catYields[x['cat']], axis=1))&(data['type']=='sig')&(~data['cat'].str.contains('NOTAG'))
+    # data['nominal_yield'] = pd.to_numeric(data['nominal_yield'], errors='coerce')
+    # data.dropna(subset=['nominal_yield'], inplace=True)
+    # mask = (data['nominal_yield']<opt.pruneThreshold*data.apply(lambda x: catYields[x['cat']], axis=1))&(data['type']=='sig')&(~data['cat'].str.contains('NOTAG'))
+    # data.loc[mask,'prune'] = 1
     # data.loc[mask,'prune'] = 1
     print("chuw",data['nominal_yield'])
     # mask = (data['nominal_yield']<opt.pruneThreshold*data.apply(lambda x: catYields[x['cat']], axis=1))&(data['type']=='sig')&(~data['cat'].str.contains('NOTAG'))
@@ -175,20 +193,36 @@ if not writeProcesses(fdata,data,opt):
   print(" --> [ERROR] in writing processes. Leaving...")
   leave()
 if opt.doSystematics:
-  for syst in experimental_systematics:
-    if not writeSystematic(fdata,data,syst,opt):
-      print(" --> [ERROR] in writing systematic %s (experiment). Leaving"%syst['name'])
-      leave()
-  writeBreak(fdata)
-  for syst in theory_systematics:
-    if not writeSystematic(fdata,data,syst,opt,stxsMergeScheme=STXSMergingScheme,scaleCorrScheme=STXSScaleCorrelationScheme):
-      print(" --> [ERROR] in writing systematic %s (theory). Leaving"%syst['name'])
-      leave()
-  writeBreak(fdata)
-  for syst in signal_shape_systematics:
-    if not writeSystematic(fdata,data,syst,opt):
-      print(" --> [ERROR] in writing systematic %s (signal shape). Leaving"%syst['name'])
-      leave()
+  if "boost" in opt.ext:
+    for syst in experimental_systematics_boost:
+      if not writeSystematic(fdata,data,syst,opt):
+        print (" --> [ERROR] in writing systematic %s (experiment). Leaving"%syst['name'])
+        leave()
+    writeBreak(fdata)
+    for syst in theory_systematics:
+      if not writeSystematic(fdata,data,syst,opt,stxsMergeScheme=STXSMergingScheme,scaleCorrScheme=STXSScaleCorrelationScheme):
+        print (" --> [ERROR] in writing systematic %s (theory). Leaving"%syst['name'])
+        leave()
+    writeBreak(fdata)
+    for syst in signal_shape_systematics:
+      if not writeSystematic(fdata,data,syst,opt):
+        print (" --> [ERROR] in writing systematic %s (signal shape). Leaving"%syst['name'])
+        leave()
+  else:
+    for syst in experimental_systematics:
+      if not writeSystematic(fdata,data,syst,opt):
+        print (" --> [ERROR] in writing systematic %s (experiment). Leaving"%syst['name'])
+        leave()
+    writeBreak(fdata)
+    for syst in theory_systematics:
+      if not writeSystematic(fdata,data,syst,opt,stxsMergeScheme=STXSMergingScheme,scaleCorrScheme=STXSScaleCorrelationScheme):
+        print (" --> [ERROR] in writing systematic %s (theory). Leaving"%syst['name'])
+        leave()
+    writeBreak(fdata)
+    for syst in signal_shape_systematics:
+      if not writeSystematic(fdata,data,syst,opt):
+        print (" --> [ERROR] in writing systematic %s (signal shape). Leaving"%syst['name'])
+        leave()
 if opt.doMCStatUncertainty:
   writeBreak(fdata)
   if not writeMCStatUncertainty(fdata,data,opt):

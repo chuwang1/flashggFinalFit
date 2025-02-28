@@ -25,9 +25,9 @@ theory_systematics = [
                 # New scheme for ggH stage 1.2 
                 
           
-                {'name':'QCDscale_ggHH','title':'QCDscale','type':'constant','prior':'lnN','correlateAcrossYears':1,'value':"0.950/1.022"},
-                {'name':'pdf_Higgs_ggHH','title':'pdf_Higgs','type':'constant','prior':'lnN','correlateAcrossYears':1,'value':"1.030"},
-                {'name':'alphaS_ggH','title':'alphaS','type':'constant','prior':'lnN','correlateAcrossYears':1,'value':"1.026"}
+				{'name':'QCDscale_ttH','title':'QCDscale_ttH','type':'constant','prior':'lnN','correlateAcrossYears':1,'value':"0.908/1.058"},
+                {'name':'pdf_Higgs_ttH','title':'pdf_Higgs_ttH','type':'constant','prior':'lnN','correlateAcrossYears':1,'value':"1.030"},
+                {'name':'alphaS_ttH','title':'alphaS_ttH','type':'constant','prior':'lnN','correlateAcrossYears':1,'value':"1.020"}
               
                
               ]
@@ -52,6 +52,7 @@ experimental_systematics = [
                 {'name':'trigger_sf_','title':'CMS_hgg_TriggerWeight','type':'factory','prior':'lnN','correlateAcrossYears':0},
                
                 {'name':'L1_prefiring_sf_','title':'CMS_hgg_prefire','type':'factory','prior':'lnN','correlateAcrossYears':0},
+				{'name':'puid_','title':'PuJetID','type':'factory','prior':'lnN','correlateAcrossYears':0},
                
                 {'name':'puWeight_','title':'CMS_hgg_puWeight','type':'factory','prior':'lnN','correlateAcrossYears':0},
 
@@ -73,6 +74,50 @@ experimental_systematics = [
                 {'name':'FJES','title':'CMS_scale_fj','type':'factory','prior':'lnN','correlateAcrossYears':0},
                 {'name':'FJHEM','title':'CMS_FatjetHEM','type':'factory','prior':'lnN','correlateAcrossYears':0},
                 {'name':'JetHEM','title':'CMS_JetHEM','type':'factory','prior':'lnN','correlateAcrossYears':0}
+
+              ]
+experimental_systematics_boost=[
+                # Updated luminosity partial-correlation scheme: 13/5/21 (recommended simplified nuisances)
+                {'name':'lumi_13TeV_Uncorrelated','title':'lumi_13TeV_Uncorrelated','type':'constant','prior':'lnN','correlateAcrossYears':0,'value':{'2016pre':'1.010','2016post':'1.010','2017':'1.020','2018':'1.015'}},
+                {'name':'lumi_13TeV_Correlated','title':'lumi_13TeV_Correlated','type':'constant','prior':'lnN','correlateAcrossYears':-1,'value':{'2016pre':'1.006','2016post':'1.006','2017':'1.009','2018':'1.020'}},
+                {'name':'lumi_13TeV_Correlated_1718','title':'lumi_13TeV_Correlated_1718','type':'constant','prior':'lnN','correlateAcrossYears':-1,'value':{'2016pre':'-','2016post':'-','2017':'1.006','2018':'1.002'}},
+                {'name':'photon_id_sf_Diphoton_Photon_','title':'CMS_hgg_MVASF','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                {'name':'photon_presel_sf_Diphoton_Photon_','title':'CMS_hgg_PreselSF','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                {'name':'electron_veto_sf_Diphoton_Photon_','title':'CMS_hgg_electronVetoSF','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                {'name':'trigger_sf_','title':'CMS_hgg_TriggerWeight','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                {'name':'L1_prefiring_sf_','title':'CMS_hgg_prefire','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                {'name':'puWeight_','title':'CMS_hgg_puWeight','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                {'name':'PNet_','title':'CMS_hgg_ParticalNet','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                {'name':'FJER','title':'CMS_FJER','type':'factory','prior':'lnN','correlateAcrossYears':0},  
+                {'name':'FJES','title':'CMS_FJES','type':'factory','prior':'lnN','correlateAcrossYears':0},    
+                # {'name':'FJESAbsoluteMPFBias','title':'CMS_FJESAbsoluteMPFBias','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESAbsoluteScale','title':'CMS_FJESAbsoluteScale','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESAbsoluteStat','title':'CMS_FJESAbsoluteStat','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESFlavorQCD','title':'CMS_FJESFlavorQCD','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESFragmentation','title':'CMS_FJESFragmentation','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESPileUpDataMC','title':'CMS_FJESPileUpDataMC','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESPileUpPtBB','title':'CMS_FJESPileUpPtBB','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESPileUpPtEC1','title':'CMS_FJESPileUpPtEC1','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESPileUpPtEC2','title':'CMS_FJESPileUpPtEC2','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESPileUpPtHF','title':'CMS_FJESPileUpPtHF','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESPileUpPtRef','title':'CMS_FJESPileUpPtRef','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESRelativeBal','title':'CMS_FJESRelativeBal','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESRelativeFSR','title':'CMS_FJESRelativeFSR','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESRelativeJEREC1','title':'CMS_FJESRelativeJEREC1','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESRelativeJEREC2','title':'CMS_FJESRelativeJEREC2','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESRelativeJERHF','title':'CMS_FJESRelativeJERHF','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESRelativePtBB','title':'CMS_FJESRelativePtBB','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESRelativePtEC1','title':'CMS_FJESRelativePtEC1','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESRelativePtEC2','title':'CMS_FJESRelativePtEC2','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESRelativePtHF','title':'CMS_FJESRelativePtHF','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESRelativeSample','title':'CMS_FJESRelativeSample','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESRelativeStatEC','title':'CMS_FJESRelativeStatEC','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESRelativeStatFSR','title':'CMS_FJESRelativeStatFSR','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESRelativeStatHF','title':'CMS_FJESRelativeStatHF','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJESSinglePionECAL','title':'CMS_FJESSinglePionECAL','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESSinglePionHCAL','title':'CMS_FJESSinglePionHCAL','type':'factory','prior':'lnN','correlateAcrossYears':1},
+                # {'name':'FJESTimePtEta','title':'CMS_FJESTimePtEta','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                {'name':'FJHEM','title':'CMS_FatjetHEM','type':'factory','prior':'lnN','correlateAcrossYears':0},
 
               ]
 

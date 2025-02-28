@@ -97,7 +97,6 @@ if opt.mergeYears:
 else:
   print( " --> Writing to: ./outdir_%s/CMS-HGG_sigfit_%s_%s_%s.root")%(opt.outputExt,opt.outputExt,opt.cat,opt.year)
   f = ROOT.TFile("./outdir_%s/CMS-HGG_sigfit_%s_%s_%s.root"%(opt.outputExt,opt.outputExt,opt.cat,opt.year),"RECREATE")
-print("chuw")
 packagedWS.Write()
 # packagedWS.Delete()
 f.Delete()
