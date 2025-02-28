@@ -132,10 +132,11 @@ def nChi2Addition(X,ssf,verbose=False):
     MHLow=int(ssf.MHLow)
     MHHigh=int(ssf.MHHigh)
     # chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh])
-	if ssf.MY.getVal() == 125:
+    if ssf.MY.getVal() == 125:
       chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose)
     else:
-      chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh]) ##2d
+    #   chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh]) ##2d
+      chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose) ##2d
     chi2sum += chi2
     K += k
   # N degrees of freedom
