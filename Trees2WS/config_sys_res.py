@@ -14,13 +14,12 @@ trees2wsCfg = {
   'theoryWeightContainers':{}, # Theory weights to add to nominal + NOTAG RooDatasets, value corresponds to number of weights (0-N)
 
   # List of systematics: use string YEAR for year-dependent systematics
-  'systematics':['fnuf', 'material', 'scale', 'smear','FJER','FJES'],
+  'systematics':['fnuf', 'material', 'scale', 'smear','JER','JES'],
 
   # Analysis categories: python list of cats or use 'auto' to extract from input tree
   'cats':'auto'
 
 }
-
-# ,'FJESAbsoluteMPFBias','FJESAbsoluteScale','FJESAbsoluteStat','FJESFlavorQCD','FJESFragmentation','FJESPileUpDataMC','FJESPileUpPtBB','FJESPileUpPtEC1','FJESPileUpPtEC2','FJESPileUpPtHF',
-#                  'FJESPileUpPtRef','FJESRelativeBal','FJESRelativeFSR','FJESRelativeJEREC1','FJESRelativeJEREC2','FJESRelativeJERHF','FJESRelativePtBB','FJESRelativePtEC1','FJESRelativePtEC2','FJESRelativePtHF','FJESRelativeSample','FJESRelativeStatEC',
-#                  'FJESRelativeStatFSR','FJESRelativeStatHF','FJESSinglePionECAL','FJESSinglePionHCAL','FJESTimePtEta'
+# ,'JESAbsoluteMPFBias','JESAbsoluteScale','JESAbsoluteStat','JESFlavorQCD','JESFragmentation','JESPileUpDataMC','JESPileUpPtBB','JESPileUpPtEC1','JESPileUpPtEC2','JESPileUpPtHF',
+#                  'JESPileUpPtRef','JESRelativeBal','JESRelativeFSR','JESRelativeJEREC1','JESRelativeJEREC2','JESRelativeJERHF','JESRelativePtBB','JESRelativePtEC1','JESRelativePtEC2','JESRelativePtHF','JESRelativeSample','JESRelativeStatEC',
+#                  'JESRelativeStatFSR','JESRelativeStatHF','JESSinglePionECAL','JESSinglePionHCAL','JESTimePtEta'

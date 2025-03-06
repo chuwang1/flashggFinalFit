@@ -17,8 +17,6 @@ def get_options():
   return parser.parse_args()
 (opt,args) = get_options()
 jetmass=int(opt.jetmass)
-high=int(opt.high)
-low=int(opt.low)
 from collections import OrderedDict as od
 from importlib import import_module
 
@@ -31,9 +29,9 @@ from tools.commonTools import *
 from tools.commonObjects import *
 
 
-print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS (DATA) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
+print " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS (DATA) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
 def leave():
-  print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+  print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
   sys.exit(1)
 
 # Function to add vars to workspace
@@ -54,7 +52,7 @@ def add_vars_to_workspace(_ws=None,_dataVars=None,jetmass=125,low=100,high=180):
       _vars[var] = ROOT.RooRealVar(var,var,0.)
     elif var == "Dijet_mass":
       _vars[var] = ROOT.RooRealVar(var,var,jetmass,low,high)
-      _vars[var].setBins((high-low)/5)
+      _vars[var].setBins((high-low)/10)
     else:
       _vars[var] = ROOT.RooRealVar(var,var,1.,-999999,999999)
       _vars[var].setBins(1)
@@ -82,15 +80,16 @@ if opt.inputConfig != '':
     cats             = _cfg['cats']
 
   else:
-    print("[ERROR] %s config file does not exist. Leaving..."%opt.inputConfig)
+    print "[ERROR] %s config file does not exist. Leaving..."%opt.inputConfig
     leave()
 else:
-  print("[ERROR] Please specify config file to run from. Leaving..."%opt.inputConfig)
+  print "[ERROR] Please specify config file to run from. Leaving..."%opt.inputConfig
   leave()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # UPROOT file
 f = uproot.open(opt.inputTreeFile)
+
 if inputTreeDir == '': listOfTreeNames = f.keys()
 else: listOfTreeNames = f[inputTreeDir].keys()
 # If cats = 'auto' then determine from list of trees
@@ -102,7 +101,17 @@ if cats == 'auto':
     elif "ERROR" in tn: continue
     c = tn.split("_%s_"%sqrts__)[-1].split(";")[0]
     cats.append(c)
-
+if len(cats) >1: 
+  print("check cat")
+  sys.exit()
+for cat in cats:
+  if inputTreeDir == '': treeName = "Data_%s_%s"%(sqrts__,cat)
+  else: treeName = "%s/Data_%s_%s"%(inputTreeDir,sqrts__,cat)
+  tree = f[treeName]
+  jet_mass = tree.array("Dijet_mass")
+  max_mass = (int(max(jet_mass))//10)*10+20
+  min_mass = (int(min(jet_mass))//10)*10-20
+  if min_mass<0:min_mass=0
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Open input ROOT file
 f = ROOT.TFile(opt.inputTreeFile)
@@ -112,24 +121,25 @@ if opt.outputWSDir is not None: outputWSDir = opt.outputWSDir+"/ws"
 else: outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws"
 if not os.path.exists(outputWSDir): os.system("mkdir %s"%outputWSDir)
 outputWSFile = outputWSDir+"/"+opt.inputTreeFile.split("/")[-1]
-print(" --> Creating output workspace: (%s)"%outputWSFile)
+print " --> Creating output workspace: (%s)"%outputWSFile
 fout = ROOT.TFile(outputWSFile,"RECREATE")
 foutdir = fout.mkdir(inputWSName__.split("/")[0])
 foutdir.cd()
 ws = ROOT.RooWorkspace(inputWSName__.split("/")[1],inputWSName__.split("/")[1])
 
 # Add variables to workspace
-varNames = add_vars_to_workspace(ws,dataVars,jetmass,low,high)
+print("check",int(max(jet_mass)),int(min(jet_mass)),min_mass,max_mass)
+varNames = add_vars_to_workspace(ws,dataVars,jetmass,min_mass,max_mass)
 
 # Make argset
 aset = make_argset(ws,varNames)
 
 # Loop over categories and 
 for cat in cats:
-  print(" --> Extracting events from category: %s"%cat)
+  print " --> Extracting events from category: %s"%cat
   if inputTreeDir == '': treeName = "Data_%s_%s"%(sqrts__,cat)
   else: treeName = "%s/Data_%s_%s"%(inputTreeDir,sqrts__,cat)
-  print("    * tree: %s"%treeName)
+  print "    * tree: %s"%treeName
   t = f.Get(treeName)
 
   # Define dataset for cat
