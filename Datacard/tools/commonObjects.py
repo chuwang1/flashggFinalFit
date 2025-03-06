@@ -29,6 +29,7 @@ BR_W_qq = 67.41*0.01
 # Production modes and decay channel: for extract XS from combine
 productionModes = ['ggH','qqH','ttH','tHq','tHW','WH','ZH','bbH']
 decayMode = 'hgg'
+decayMode_2d = 'hjjgg'
 
 # flashgg input WS objects
 inputWSName__ = "tagsDumper/cms_hgg_13TeV"
@@ -36,6 +37,7 @@ inputNuisanceExtMap = {'scales':'MCScale','scalesCorr':'','smears':'MCSmear'}
 # Signal output WS objects
 outputWSName__ = "wsig"
 outputWSObjectTitle__ = "hggpdfsmrel"
+outputWSObjectTitle2d__ = "hhbbggpdfsmrel"
 outputWSNuisanceTitle__ = "CMS_hgg_nuisance"
 outputNuisanceExtMap = {'scales':'%sscale'%sqrts__,'scalesCorr':'%sscaleCorr'%sqrts__,'smears':'%ssmear'%sqrts__,'scalesGlobal':'%sscale'%sqrts__}
 # Bkg output WS objects
