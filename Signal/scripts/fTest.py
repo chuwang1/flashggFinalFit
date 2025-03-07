@@ -2,7 +2,9 @@
 # * run per category over single mass point
 
 print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG SIGNAL FTEST ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
+
 import ROOT
+
 import pandas as pd
 import pickle
 import math
@@ -20,6 +22,7 @@ from simultaneousFit import *
 from plottingTools import *
 
 MHLow, MHHigh = '120', '130'
+
 
 def leave():
   print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG SIGNAL FTEST (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ")
@@ -67,13 +70,13 @@ MH.setUnit("GeV")
 MH.setConstant(True)
 
 # Loop over processes: extract sum entries and fill dict. Default nRV,nWV = 1,1
+
 df = pd.DataFrame(columns=['proc','sumEntries','nRV','nWV'])
 procYields = od()
 for proc in opt.procs.split(","):
   WSFileName = glob.glob("%s/output*M%s*%s.root"%(opt.inputWSDir,opt.mass,proc))[0]
   f = ROOT.TFile(WSFileName,"read")
   inputWS = f.Get(inputWSName__)
-  print('"%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.mass,sqrts__,opt.cat)',"%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.mass,sqrts__,opt.cat))
   print("inputWSfilename:",inputWSName__)
   print(procToData(proc.split("_")[0])," ",opt.mass," ",sqrts__," ",opt.cat)
   d = reduceDataset(inputWS.data("%s_%s_%s_%s"%(procToData(proc.split("_")[0]),opt.mass,sqrts__,opt.cat)),aset)

@@ -314,6 +314,7 @@ if not opt.skipVertexScenarioSplit:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # FINAL MODEL: construction
 print("\n --> Constructing final model")
+print(ssfMap.keys())
 fm = FinalModel(ssfMap,opt.proc,opt.cat,opt.ext,opt.year,sqrts__,nominalDatasets,xvar,MH,MHLow,MHHigh,opt.massPoints,xsbrMap,procSyst,opt.scales,opt.scalesCorr,opt.scalesGlobal,opt.smears,opt.doVoigtian,opt.useDCB,opt.skipVertexScenarioSplit,opt.skipSystematics,opt.doEffAccFromJson)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -334,10 +335,13 @@ if opt.doPlots:
   print("\n --> Making plots...")
   if not os.path.isdir("%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext)): os.system("mkdir %s/outdir_%s/signalFit/Plots"%(swd__,opt.ext))
   if opt.skipVertexScenarioSplit:
-    plotPdfComponents(ssfRV,opt.xvar,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext),_extension="total_",_proc=procRVFit,_cat=catRVFit) 
+
+    plotPdfComponents(ssfRV,opt.xvar,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext),_extension="total_",_proc=procRVFit,_cat=catRVFit,low=int(opt.MHLow),high=int(opt.MHHigh)) 
   if not opt.skipVertexScenarioSplit:
     plotPdfComponents(ssfRV,opt.xvar,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext),_extension="RV_",_proc=procRVFit,_cat=catRVFit) 
     plotPdfComponents(ssfWV,opt.xvar,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext),_extension="WV_",_proc=procWVFit,_cat=catRVFit) 
   # Plot interpolation
-  plotInterpolation(fm,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext)) 
-  plotSplines(fm,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext),_nominalMass=MHNominal) 
+  if(opt.xvar!="CMS_hgsg_mass"):
+    plotInterpolation(fm,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext)) 
+  
+    plotSplines(fm,_outdir="%s/outdir_%s/signalFit/Plots"%(swd__,opt.ext),_nominalMass=MHNominal) 

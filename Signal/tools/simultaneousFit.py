@@ -1,12 +1,16 @@
 # Class for performing simultaneous signal fit
 import ROOT
 import json
+
 import numpy as np
 from scipy.optimize import minimize
 import scipy.stats
+
 from collections import OrderedDict as od
+
 from array import array
 import ctypes
+
 # Parameter lookup table for initialisation
 # So far defined up to MHPolyOrder=2
 pLUT = od()
@@ -15,11 +19,11 @@ pLUT['Gaussian_wdcb'] = od()
 pLUT['Gaussian_wdcb']['dm_p0'] = [0.0,-100,100]
 pLUT['Gaussian_wdcb']['dm_p1'] = [0.01,-0.01,0.01]
 pLUT['Gaussian_wdcb']['dm_p2'] = [0.01,-0.01,0.01]
-pLUT['Gaussian_wdcb']['sigma_p0'] = [40,1.0,100.]
+pLUT['Gaussian_wdcb']['sigma_p0'] = [10,1.0,300.]
 pLUT['Gaussian_wdcb']['sigma_p1'] = [0.0,-0.1,0.1]
 pLUT['Gaussian_wdcb']['sigma_p2'] = [0.0,-0.001,0.001]
 pLUT['Frac'] = od()
-pLUT['Frac']['p0'] = [0.25,0.01,0.9999]
+pLUT['Frac']['p0'] = [0.25,0.00001,0.9999]
 pLUT['Frac']['p1'] = [0.,-0.05,0.05]
 pLUT['Frac']['p2'] = [0.,-0.0001,0.0001]
 pLUT['Gaussian'] = od()
@@ -64,7 +68,6 @@ def calcChi2(x,pdf,d,errorType="Poisson",_verbose=False,fitRange=[105,150]):
   for i in range(d.numEntries()):
     p = d.get(i)
     x.setVal(p.getRealValue(x.GetName()))
-
  
     if( x.getVal() < fitRange[0] )|( x.getVal() > fitRange[1] ): continue
     ndata = d.weight()
@@ -109,11 +112,12 @@ def calcChi2(x,pdf,d,errorType="Poisson",_verbose=False,fitRange=[105,150]):
   # If verbose: print(to screen)
   if _verbose:
     for i in range(len(terms)):
+    #   print(len(terms))
       print((" --> [DEBUG] Bin %g : nPdf = %.6f, nData = %.6f, e(%s) = %.6f --> chi2 term = %.6f"%(bins[i],nPdf[i],nData[i],errorType,e[i],terms[i])))
 
   # Sum terms
   result = terms.sum()
-
+#   print(k)
   return result,k
 
 # Function to add chi2 for multiple mass points
@@ -132,14 +136,20 @@ def nChi2Addition(X,ssf,verbose=False):
     MHLow=int(ssf.MHLow)
     MHHigh=int(ssf.MHHigh)
     # chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh])
-    if ssf.MY.getVal() == 125:
-      chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose)
+    if(ssf.xvar.GetName()=="CMS_hgg_mass"):
+        # print("chuw")
+        chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose)
     else:
-    #   chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh]) ##2d
-      chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose) ##2d
+        if ssf.proc == "gghh" :
+            # print("chuw ====",MHLow,MHHigh)
+            chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh])
+        else:
+            chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[0,1000]) ##2d
+    #   chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose) ##2d
     chi2sum += chi2
     K += k
   # N degrees of freedom
+#   print(K,C)
   ndof = K-C
   ssf.setNdof(ndof)
   return chi2sum
@@ -157,7 +167,7 @@ class SimultaneousFit:
     self.MHLow = _MHLow
     self.MHHigh = _MHHigh
     self.massPoints = _massPoints
-    self.nBins = _nBins
+    # self.nBins = _nBins
     self.MHPolyOrder = _MHPolyOrder
     self.minimizerMethod = _minimizerMethod
     self.minimizerTolerance = _minimizerTolerance
@@ -165,7 +175,7 @@ class SimultaneousFit:
     # Prepare vars
     self.MH.setConstant(False)
     self.MH.setVal(_MY)  ### change Y
-    self.MH.setBins(10)
+    # self.MH.setBins(10)
     self.jetmass=_MY
     self.MY = ROOT.RooRealVar("constY", "constY",_MY,60, 4000)
     self.MY.setVal(_MY)
@@ -173,7 +183,21 @@ class SimultaneousFit:
     self.dMH = ROOT.RooFormulaVar("dMH","dMH","@0-@1",ROOT.RooArgList(self.MH,self.MY))  ## change Y
     self.xvar.setVal(_MY)
     # print(type(_nBins),"simul")
+    if self.xvar.GetName()=="CMS_hgg_mass":
+    #  print(_nBins)
+     self.nBins= _nBins
+    else:
+     if(_MY<200):
+       self.nBins=int((self.xvar.getMax()-self.xvar.getMin())/2.5)
+     elif(_MY>=200 and _MY<900):
+       self.nBins=int((self.xvar.getMax()-self.xvar.getMin())/10) 
+     else:
+       self.nBins=int((self.xvar.getMax()-self.xvar.getMin())/20) 
+      
     self.xvar.setBins(self.nBins)
+    # print(self.xvar.getMax())
+    # print(self.xvar.getMin())
+    
     # Dicts to store all fit vars, polynomials, pdfs and splines
     self.constOne = ROOT.RooRealVar("constOne", "constOne", 1,0, 10)
     self.constOne.setVal(1)
@@ -232,26 +256,43 @@ class SimultaneousFit:
 
     # DCB
     pLUT['DCB'] = od()
-    pLUT['DCB']['dm_p0'] = [self.jetmass,float(self.MHLow),float(self.MHHigh)]
+    if(self.proc == "gghh"):
+        pLUT['DCB']['dm_p0'] = [self.jetmass,self.jetmass-self.jetmass*0.3,self.jetmass+self.jetmass*0.25]
+        pLUT['DCB']['dmGau_p0'] = [self.jetmass,self.jetmass-self.jetmass*0.25,self.jetmass+self.jetmass*0.25]
+        pLUT['DCB']['n1_p0'] = [35.,0.01,1000.]
+        pLUT['DCB']['n2_p0'] = [4.5,0.01,1000]
+        pLUT['DCB']['a1_p0'] = [0.5,0.001,2]
+        pLUT['DCB']['a2_p0'] = [0.01,1,10]
+        pLUT['DCB']['sigma_p0'] = [20,0.0,1000.]
+    else:
+        # print("chuw : set mass 125")
+        pLUT['DCB']['dm_p0'] = [250,60,400]
+        pLUT['DCB']['dmGau_p0'] = [250,60,400]
+        pLUT['DCB']['n1_p0'] = [0.5,0.01,1000.]
+        pLUT['DCB']['n2_p0'] = [0.5,0.01,1000]
+        pLUT['DCB']['a1_p0'] = [0.01,0.001,10]
+        pLUT['DCB']['a2_p0'] = [1,1,10]
+        pLUT['DCB']['sigma_p0'] = [10,0.0,200.]
     pLUT['DCB']['dm_p1'] = [0.0,-10,10]
     pLUT['DCB']['dm_p2'] = [0.0,-0.1,0.1]
-    pLUT['DCB']['sigma_p0'] = [20,0.0,100.]
+    pLUT['DCB']['dmGau_p1'] = [0.0,-10,10]
+    pLUT['DCB']['dmGau_p2'] = [0.0,-0.1,0.1]
+
     pLUT['DCB']['sigma_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['sigma_p2'] = [0.0,-0.001,0.001]
-    pLUT['DCB']['n1_p0'] = [35.,0.01,1000.]
     pLUT['DCB']['n1_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['n1_p2'] = [0.0,-0.001,0.001]
-    pLUT['DCB']['n2_p0'] = [4.5,0.01,500]
+
     pLUT['DCB']['n2_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['n2_p2'] = [0.0,-0.001,0.001]
-    pLUT['DCB']['a1_p0'] = [0.11,0.01,100]
+    pLUT['DCB']['a1_p0'] = [0.5,0.001,2]
     pLUT['DCB']['a1_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['a1_p2'] = [0.0,-0.001,0.001]
-    pLUT['DCB']['a2_p0'] = [0.11,0.01,100]
+    pLUT['DCB']['a2_p0'] = [0.01,1,10]
     pLUT['DCB']['a2_p1'] = [0.0,-0.1,0.1]
     pLUT['DCB']['a2_p2'] = [0.0,-0.001,0.001]
     # Define polynominal functions (in dMH)
-    for f in ['dm','sigma','n1','n2','a1','a2']: 
+    for f in ['dm','sigma','n1','n2','a1','a2','dmGau']: 
       k = "%s_dcb"%f
       self.Varlists[k] = ROOT.RooArgList("%s_coeffs"%k)
       # Create coeff for polynominal of order MHPolyOrder: y = a+bx+cx^2+...
@@ -261,9 +302,12 @@ class SimultaneousFit:
       # Define polynominali
       self.constOne.setConstant(True)
       self.Polynomials[k] = ROOT.RooPolyVar(k,k,self.constOne,self.Varlists[k])
+
     # Mean function
-    
+
     self.Polynomials['mean_dcb'] = ROOT.RooFormulaVar("mean_dcb","mean_dcb","(@0)",ROOT.RooArgList(self.Polynomials['dm_dcb']))
+    self.Polynomials['mean_gau'] = ROOT.RooFormulaVar("mean_gau","mean_gau","(@0)",ROOT.RooArgList(self.Polynomials['dmGau_dcb']))
+    # print(self.Polynomials.keys())
     # Build DCB
     self.Pdfs['dcb'] = ROOT.RooDoubleCBFast("dcb","dcb",self.xvar,self.Polynomials['mean_dcb'],self.Polynomials['sigma_dcb'],self.Polynomials['a1_dcb'],self.Polynomials['n1_dcb'],self.Polynomials['a2_dcb'],self.Polynomials['n2_dcb'])
  
@@ -277,28 +321,30 @@ class SimultaneousFit:
     # Define polynomial
     self.Polynomials[k] = ROOT.RooPolyVar(k,k,self.constOne,self.Varlists[k])
     # Build Gaussian
-    #self.Pdfs['gaus'] = ROOT.RooGaussian("gaus","gaus",self.xvar,self.Polynomials['mean_dcb'],self.Polynomials['sigma_gaus'])
+    self.Pdfs['gaus'] = ROOT.RooGaussian("gaus","gaus",self.xvar,self.Polynomials['mean_gau'],self.Polynomials['sigma_gaus'])
     
         
     # Relative fraction: also polynomial of order MHPolyOrder
-    #self.Varlists['frac'] = ROOT.RooArgList("frac_coeffs")
-    #for po in range(0,self.MHPolyOrder+1):
-      #self.Vars['frac_p%g'%po] = ROOT.RooRealVar("frac_p%g"%po,"frac_p%g"%po,pLUT['Frac']['p%g'%po][0],pLUT['Frac']['p%g'%po][1],pLUT['Frac']['p%g'%po][2])
-      #self.Varlists['frac'].add( self.Vars['frac_p%g'%po] )
+    self.Varlists['frac'] = ROOT.RooArgList("frac_coeffs")
+    for po in range(0,self.MHPolyOrder+1):
+      self.Vars['frac_p%g'%po] = ROOT.RooRealVar("frac_p%g"%po,"frac_p%g"%po,pLUT['Frac']['p%g'%po][0],pLUT['Frac']['p%g'%po][1],pLUT['Frac']['p%g'%po][2])
+      self.Varlists['frac'].add( self.Vars['frac_p%g'%po] )
     # Define Polynomial
-    #self.Polynomials['frac'] = ROOT.RooPolyVar('frac','frac',self.dMH,self.Varlists['frac'])
+    self.Polynomials['frac'] = ROOT.RooPolyVar('frac','frac',self.dMH,self.Varlists['frac'])
     # Constrain fraction to not be above 1 or below 0
-    #self.Polynomials['frac_constrained'] = ROOT.RooFormulaVar("frac_constrained","frac_constrained","(@0>0)*(@0<1)*@0+(@0>1.0)*0.9999",ROOT.RooArgList(self.Polynomials['frac']))
-    #self.Coeffs['frac_constrained'] = self.Polynomials['frac_constrained' ]
+    self.Polynomials['frac_constrained'] = ROOT.RooFormulaVar("frac_constrained","frac_constrained","(@0>0)*(@0<1)*@0+(@0>1.0)*0.9999",ROOT.RooArgList(self.Polynomials['frac']))
+    self.Coeffs['frac_constrained'] = self.Polynomials['frac_constrained' ]
 
     # Define total PDF
-    #_pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
-    #for pdf in ['dcb','gaus']: _pdfs.add(self.Pdfs[pdf])
-    #_coeffs.add(self.Coeffs['frac_constrained'])
+    _pdfs, _coeffs = ROOT.RooArgList(), ROOT.RooArgList()
+    for pdf in ['dcb','gaus']: _pdfs.add(self.Pdfs[pdf])
+    _coeffs.add(self.Coeffs['frac_constrained'])
+    if(self.proc == "gghh"):
+      self.Pdfs['final'] = ROOT.RooAddPdf("%s_%s"%(self.proc,self.cat),"%s_%s"%(self.proc,self.cat),_pdfs,_coeffs,_recursive)
     # self.Pdfs['final']=self.Pdfs['dcb']
-    # self.Pdfs['final'] = ROOT.RooAddPdf("%s_%s"%(self.proc,self.cat),"%s_%s"%(self.proc,self.cat),_pdfs,_coeffs,_recursive)
-    self.Pdfs['final'] = self.Pdfs['dcb']
-    # self.Pdfs['final'] = ROOT.RooFFTConvPdf("%s_%s"%(self.proc,self.cat),"%s_%s"%(self.proc,self.cat),self.xvar,self.Pdfs['dcb'],self.Pdfs['gaus'])
+    else:
+    #  self.Pdfs['final'] = ROOT.RooAddPdf("%s_%s"%(self.proc,self.cat),"%s_%s"%(self.proc,self.cat),_pdfs,_coeffs,_recursive)
+      self.Pdfs['final'] = self.Pdfs['dcb']
   
     
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
@@ -355,15 +401,19 @@ class SimultaneousFit:
   def runFit(self):
     # Extract fit variables: remove xvar from fit parameters
     fv = self.Pdfs['final'].getVariables().Clone()
-   
+    # print(fv) 
     fv.remove(self.xvar)
     fv.remove(self.constOne)
+    # for i in fv:
+    #     print(i.GetName())
     self.FitParameters = ROOT.RooArgList(fv)
 
     # Create initial vector of parameters and calculate initial Chi2
     if self.verbose: print("\n --> (%s) Initialising fit parameters"%self.name)
     x0 = self.extractX0()
+    # print(x0)
     xbounds = self.extractXBounds()
+    # print(xbounds)
     self.Chi2 = self.getChi2()
     # Print parameter pre-fit values
     if self.verbose: self.printFitParameters(title="Pre-fit")
@@ -380,11 +430,17 @@ class SimultaneousFit:
   # Function build RooSpline1D from Polynomials to model MH dependence on fit params
   def buildSplines(self):
     # Loop over polynomials
-
+    
     for k, poly in self.Polynomials.items():
+      print("chuw:",poly.GetName())
       _x, _y = [], []
-      _mh = 100.
-      while(_mh<180.1):
+      if(self.xvar.GetName()=="CMS_hgg_mass"):
+        _mh = 100.
+        maxVal=180.1
+      else:
+        maxVal=self.xvar.getMax()
+        _mh=self.xvar.getMin()
+      while(_mh<maxVal):
         self.MH.setVal(_mh)
         _x.append(_mh)
         _y.append(poly.getVal())
@@ -400,7 +456,7 @@ class SimultaneousFit:
     print((" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"))
     print((" --> (%s) %s parameter values:"%(self.name,title)))
     # Skip MH
-    for i in range(1,len(self.FitParameters)): print(("    * %-20s = %.6f"%(self.FitParameters[i].GetName(),self.FitParameters[i].getVal())))
+    for i in range(0,len(self.FitParameters)): print(("    * %-20s = %.6f"%(self.FitParameters[i].GetName(),self.FitParameters[i].getVal())))
     print(("    ~~~~~~~~~~~~~~~~"))
     print(("    * chi2 = %.6f, n(dof) = %g --> chi2/n(dof) = %.3f"%(self.getChi2(),int(self.Ndof),self.getChi2()/int(self.Ndof))))
     print(("    ~~~~~~~~~~~~~~~~"))

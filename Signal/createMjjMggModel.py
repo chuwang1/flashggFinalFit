@@ -43,11 +43,11 @@ for num,f in enumerate(input_procs):
   for year in '2017,2018,2016pre,2016post'.split(','):
     for cat_num,cat in enumerate(cats) : 
     #for cat_num,cat in enumerate([cats[0]]) : 
-      pdf_mjj_old = "hggpdfsmrel_%s_%s_%s_13TeV"%(input_procs[num],year,cat)
+      pdf_mjj_old = "hjjpdfsmrel_%s_%s_%s_13TeV"%(input_procs[num],year,cat)
       pdf_mjj = "hjjpdfsmrel_%s_%s_%s_13TeV"%(input_procs[num],year,cat)
-      old_pdf = ws_mjj.pdf(pdf_mjj_old)
-      new_pdf = old_pdf.Clone(pdf_mjj)
-      new_pdf.SetName(pdf_mjj)
+      new_pdf = ws_mjj.pdf(pdf_mjj)
+    #   new_pdf = old_pdf.Clone(pdf_mjj)
+    #   new_pdf.SetName(pdf_mjj)
       
       pdf_mgg = "hggpdfsmrel_%s_%s_%s_13TeV"%(input_procs[num],year,cat)
      

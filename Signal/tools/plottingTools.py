@@ -185,7 +185,7 @@ def plotFTestResults(ssfs,_opt,_outdir="./",_extension='',_proc='',_cat='',_mass
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Signal fit plots
 # Plot final pdf at MH = 125 (with data) + individual Pdf components
-def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc='',_cat=''):
+def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc='',_cat='',low=100,high=180):
   canv = ROOT.TCanvas()
   canv.SetLeftMargin(0.15)
   ssf.MH.setVal(125)
@@ -194,7 +194,7 @@ def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc=''
   hists = od()
   hmax, hmin = 0, 0
   # Total pdf histogram
-  hists['final'] = ssf.Pdfs['final'].createHistogram("h_final%s"%_extension,ssf.xvar,ROOT.RooFit.Binning(1600))
+  hists['final'] = ssf.Pdfs['final'].createHistogram("h_final%s"%_extension,ssf.xvar,ROOT.RooFit.Binning(6400))
   hists['final'].SetLineWidth(2)
   hists['final'].SetLineColor(1)
   hists['final'].SetTitle("")
@@ -205,9 +205,9 @@ def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc=''
   hists['final'].SetMinimum(0)
   if hists['final'].GetMaximum()>hmax: hmax = hists['final'].GetMaximum()
   if hists['final'].GetMinimum()<hmin: hmin = hists['final'].GetMinimum()
-
-  # hists['final'].GetXaxis().SetRangeUser(70,400)
-  # hists['final'].GetXaxis().SetRangeUser(100,150)
+  if(var=="Dijet_mass"):
+    hists['final'].GetXaxis().SetRangeUser(low,high)
+#   hists['final'].GetXaxis().SetRangeUser(100,150)
 
 
   # Create data histogram
@@ -219,12 +219,12 @@ def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc=''
   else:
     hists['data'].GetXaxis().SetTitle("m_{jj} [GeV]")
   hists['data'].SetMinimum(0)
+  if(var=="Dijet_mass"):
+    hists['data'].GetXaxis().SetRangeUser(low,high)
+#   hists['data'].GetXaxis().SetRangeUser(100,150)
 
-  # hists['data'].GetXaxis().SetRangeUser(70,400)
-  # hists['data'].GetXaxis().SetRangeUser(100,150)
 
-
-  hists['data'].Scale(float(ssf.nBins)/1600)
+  hists['data'].Scale(float(ssf.nBins)/6400)
   hists['data'].SetMarkerStyle(20)
   hists['data'].SetMarkerColor(1)
   hists['data'].SetLineColor(1)
@@ -242,13 +242,24 @@ def plotPdfComponents(ssf,var="CMS_hgg_mass",_outdir='./',_extension='',_proc=''
   if len(list(pdfs.keys()))!=1:
     pdfItr = 0
     for k,v in pdfs.items():
+      print(k,v)
       if pdfItr == 0:
-        if "gaus" in k: frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_g0_constrained")
+        if "gaus" in k: 
+          print("we have gaus")
+          frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_p0")
         else: frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_constrained")
       else:
-        frac = ssf.Pdfs['final'].getComponents().getRealValue("%s_%s_recursive_fraction_%s"%(ssf.proc,ssf.cat,k))
+        if var=="CMS_hgg_mass": 
+          frac = ssf.Pdfs['final'].getComponents().getRealValue("%s_%s_recursive_fraction_%s"%(ssf.proc,ssf.cat,k))
+        else: 
+          if "gaus" in k:
+            frac = 1-ssf.Pdfs['final'].getComponents().getRealValue("frac_constrained")
+          else:
+            frac = ssf.Pdfs['final'].getComponents().getRealValue("frac_constrained")
+            
+    #   print(frac)
       # Create histogram with 1600 bins
-      hists[k] = v.createHistogram("h_%s%s"%(k,_extension),ssf.xvar,ROOT.RooFit.Binning(1600))
+      hists[k] = v.createHistogram("h_%s%s"%(k,_extension),ssf.xvar,ROOT.RooFit.Binning(6400))
       hists[k].Scale(frac)
       hists[k].SetLineColor(LineColorMap[pdfItr])
       hists[k].SetLineWidth(2)
