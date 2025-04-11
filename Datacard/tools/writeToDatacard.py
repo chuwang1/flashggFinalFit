@@ -40,12 +40,16 @@ def writeProcesses(f,d,options):
     lbin_cat += "%-55s "%cat
     lobs_cat += "%-55s "%"-1"
     sigID = 0
+    singleID = 2
     # Loop over rows for respective category
     for ir,r in d[d['cat']==cat].iterrows():
       if r['proc'] == "data_obs": continue
       lbin_procXcat += "%-55s "%cat
       lproc += "%-55s "%r['proc']
       if r['proc'] == "bkg_mass": lprocid += "%-55s "%"1"
+      elif any(keyword in r['proc'] for keyword in ["VBF", "GGH", "VH", "ttH"]):
+        lprocid += "%-55s "%singleID
+        singleID += 1
       else:
         lprocid += "%-55s "%sigID
         sigID -= 1
@@ -66,9 +70,10 @@ def writeSystematic(f,d,s,options,stxsMergeScheme=None,scaleCorrScheme=None):
   # For signal shape systematics add simple line
   if s['type'] == 'signal_shape':
     stitle = "%s_%s"%(outputWSNuisanceTitle__,s['title'])
-    if s['mode'] != 'other':
-      if outputNuisanceExtMap[s['mode']] != '':
-        stitle += "_%s"%outputNuisanceExtMap[s['mode']]
+    # if s['mode'] != 'other':
+    #   if outputNuisanceExtMap[s['mode']] != '':
+    #     stitle += "_%s"%outputNuisanceExtMap[s['mode']]
+    if s['mode'] != 'other': stitle += "_%s"%outputNuisanceExtMap[s['mode']]
     # If not correlated: separate nuisance per year
     if s['mode'] in ['scales','smears']:
       for year in options.years.split(","):
@@ -130,11 +135,11 @@ def writeSystematic(f,d,s,options,stxsMergeScheme=None,scaleCorrScheme=None):
                 for ir,r in d[d['cat']==cat].iterrows():
                   if r['proc'] == "data_obs": continue
                   # Remove year+hgg tags from proc
-                  p = re.sub("_2016_hgg","",r['proc'])
+                  p = re.sub("_2016post_hgg","",r['proc'])
+                  p = re.sub("_2016pre_hgg","",p)
                   p = re.sub("_2017_hgg","",p)
                   p = re.sub("_2018_hgg","",p)
-                  p = re.sub("_2022preEE_hgg","",p)
-                  p = re.sub("_2022postEE_hgg","",p)
+                #   p = re.sub("_2022postEE_hgg","",p)
                   # Add value if in proc in phase space else -
                   if p in psProcs: sval = r["%s%s"%(s['name'],tierStr)]
                   else: sval = '-'
@@ -219,11 +224,12 @@ def writeMCStatUncertainty(f,d,options):
       for cat in d.cat.unique():
         for ir,r in d[d['cat']==cat].iterrows():
           if r['proc'] == "data_obs": continue
-          elif r['type'] == "sig": 
-            sval = scval if cat == scat else '-'
-          else:
-            sval = '-'
+        #   elif r['type'] == "sig": 
+        #     sval = scval if cat == scat else '-'
+        #   else:
+        #     sval = '-'
           # Extract value and add to line (with checks)
+          sval = scval if cat == scat else '-'
           lsyst = addSyst(lsyst,sval,stitle,r['proc'],cat)
       # Remove final space from line and add to file
       f.write("%s\n"%lsyst[:-1])

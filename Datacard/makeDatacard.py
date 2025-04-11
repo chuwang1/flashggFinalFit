@@ -47,7 +47,7 @@ print(" --> Loading per category dataframes into single dataframe")
 print('opt.ext',opt.ext)
 extStr = "_%s"%opt.ext if opt.ext != '' else ''
 pkl_files = glob.glob("./yields%s/*.pkl"%extStr)
-print('"./yields%s/*.pkl"%extStr',"./yields%s/*.pkl"%extStr)
+# print('"./yields%s/*.pkl"%extStr',"./yields%s/*.pkl"%extStr)
 print('pkl_files',pkl_files)
 pkl_files.sort() # Categories in alphabetical order
 data = pd.DataFrame()
@@ -69,6 +69,7 @@ if opt.doSystematics:
   theoryFactoryType = {}
   mask = (~data['cat'].str.contains("NOTAG"))&(data['type']=='sig')
   if "boost" in opt.ext:
+
     for s in experimental_systematics_boost:
       if s['type'] == 'factory': 
         # Fix for HEM as only in 2018 workspaces
@@ -91,13 +92,14 @@ if opt.doSystematics:
   # Add constant systematics to dataFrame
   if "boost" in opt.ext:
     for s in experimental_systematics_boost:
+    #   print("now boost",s)
       if s['type'] == 'constant': data = addConstantSyst(data,s,opt)
     data = experimentalSystFactory(data, experimental_systematics_boost, experimentalFactoryType, opt )
   else:
     for s in experimental_systematics:
       if s['type'] == 'constant': data = addConstantSyst(data,s,opt)
     data = experimentalSystFactory(data, experimental_systematics, experimentalFactoryType, opt )
-  data = experimentalSystFactory(data, experimental_systematics, experimentalFactoryType, opt )
+#   data = experimentalSystFactory(data, experimental_systematics, experimentalFactoryType, opt )
 
   # Theory:
   print(" --> Adding theory systematics variations to dataFrame")

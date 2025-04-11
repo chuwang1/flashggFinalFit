@@ -104,3 +104,5 @@ STXSScaleCorrelationScheme['ttH_scale_lowpt'] = ['ttH_PTH_200_300', 'ttH_PTH_60_
 STXSScaleCorrelationScheme['ttH_scale_highpt'] = ['ttH_PTH_GT300']
 STXSScaleCorrelationScheme['tH_scale'] = ['tHq','tHW']
 STXSScaleCorrelationScheme['bbH_scale'] = ['bbH']
+STXSScaleCorrelationScheme['ttH'] = ['ttH']
+

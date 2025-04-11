@@ -41,7 +41,7 @@ def get_options():
   parser.add_option('--skipCOWCorr', dest='skipCOWCorr', default=False, action="store_true", help="Skip centralObjectWeight correction for events in acceptance. Use if no centralObjectWeight in workspace")
   # For systematics:
   parser.add_option('--doSystematics', dest='doSystematics', default=False, action="store_true", help="Include systematics calculations and add to datacard")
-  parser.add_option('--do2DFits', dest='do2DFits', default=True, action="store_true", help="Include systematics calculations and add to datacard")
+  parser.add_option('--do2DFits', dest='do2DFits', default=False, action="store_true", help="Include systematics calculations and add to datacard")
   parser.add_option('--ignore-warnings', dest='ignore_warnings', default=False, action="store_true", help="Skip errors for missing systematics. Instead output warning message")
   return parser.parse_args()
 (opt,args) = get_options()
@@ -52,7 +52,7 @@ for i in opt.inputWSDirMap.split(","):
   print(" --> Taking %s input workspaces from: %s"%(i.split("=")[0],i.split("=")[1]) )
   if not os.path.isdir( i.split("=")[1] ):
     print(" --> [ERROR] Directory %s does not exist. Leaving..."%i.split("=")[1])
-    leave()
+    # leave()
   inputWSDirMap[i.split("=")[0]] = i.split("=")[1]
 years = inputWSDirMap.keys()
 
@@ -98,7 +98,7 @@ for year in years:
     else: _cat = "%s_%s"%(opt.cat,year)
 
     # Input flashgg ws 
-    print("%s/*M%s*_%s.root"%(inputWSDirMap[year],opt.mass,proc))
+    # print("%s/*M%s*_%s.root"%(inputWSDirMap[year],opt.mass,proc))
     _inputWSFile = glob.glob("%s/*M%s*_%s.root"%(inputWSDirMap[year],opt.mass,proc))[0]
     _nominalDataName = "%s_%s_%s_%s"%(_proc_s0,opt.mass,sqrts__,opt.cat)
 
@@ -154,7 +154,6 @@ if( not opt.skipBkg)&( opt.cat != "NOTAG" ):
     if(opt.do2DFits):
         # datafile=opt.bkgModelWSDir+"/allData.root"
         # modelname="Data_13TeV_%s"%(_cat)
-        print(_modelWSFile)
         data.loc[len(data)] = ["merged",'bkg',_proc_bkg,_proc_bkg,'-',_cat,_inputWSFile,_nominalDataName,_modelWSFile,_model_bkg,opt.bkgScaler]
         data.loc[len(data)] = ["merged",'data',_proc_data,_proc_data,'-',_cat,_inputWSFile,_nominalDataName,_modelWSFile,_model_data,-1] ##2D fit
     else:
@@ -201,7 +200,6 @@ if opt.doSystematics:
     # No experimental systematics for NOTAG
     if opt.cat != "NOTAG":
       for s in experimental_systematics_boost: 
-        print(s)
         if s['type'] == 'factory': 
     # Fix for HEM as only in 2018 workspaces
           if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
@@ -228,7 +226,6 @@ if opt.doSystematics:
     # No experimental systematics for NOTAG
     if opt.cat != "NOTAG":
       for s in experimental_systematics: 
-        print(s)
         if s['type'] == 'factory': 
     # Fix for HEM as only in 2018 workspaces
           if s['name'] == 'JetHEM': experimentalFactoryType[s['name']] = "a_h"
@@ -289,7 +286,7 @@ for ir,r in data[data['type']=='sig'].iterrows():
     if "NOTAG" not in r['cat']:
 
       # Skip centralObjectWeight correction as concerns events in acceptance
-      print("contents",contents)
+    #   print("contents",contents)
       experimentalSystYields = calcSystYields(r['nominalDataName'],contents,inputWS,experimentalFactoryType,skipCOWCorr=True,proc=r['proc'],year=r['year'],ignoreWarnings=opt.ignore_warnings)
       for s,f in experimentalFactoryType.items():
 	      if f in ['a_w','a_h']: 

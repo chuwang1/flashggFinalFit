@@ -70,9 +70,9 @@ experimental_systematics = [
 
                 {'name':'JES','title':'CMS_scale_j','type':'factory','prior':'lnN','correlateAcrossYears':0},
                 {'name':'JER','title':'CMS_res_j','type':'factory','prior':'lnN','correlateAcrossYears':0},
-                {'name':'FJER','title':'CMS_res_fj','type':'factory','prior':'lnN','correlateAcrossYears':0},
-                {'name':'FJES','title':'CMS_scale_fj','type':'factory','prior':'lnN','correlateAcrossYears':0},
-                {'name':'FJHEM','title':'CMS_FatjetHEM','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJER','title':'CMS_res_fj','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJES','title':'CMS_scale_fj','type':'factory','prior':'lnN','correlateAcrossYears':0},
+                # {'name':'FJHEM','title':'CMS_FatjetHEM','type':'factory','prior':'lnN','correlateAcrossYears':0},
                 {'name':'JetHEM','title':'CMS_JetHEM','type':'factory','prior':'lnN','correlateAcrossYears':0}
 
               ]
@@ -120,6 +120,7 @@ experimental_systematics_boost=[
                 {'name':'FJHEM','title':'CMS_FatjetHEM','type':'factory','prior':'lnN','correlateAcrossYears':0},
 
               ]
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -5,8 +5,8 @@ from optparse import OptionParser
 from collections import OrderedDict as od
 
 # Import tools
-from tools.commonTools import *
-from tools.commonObjects import *
+from commonTools import *
+from commonObjects import *
 from tools.submissionTools import *
 
 def get_options():
@@ -30,6 +30,7 @@ def get_options():
   parser.add_option('--skipCOWCorr', dest='skipCOWCorr', default=False, action="store_true", help="Skip centralObjectWeight correction for events in acceptance. Use if no centralObjectWeight in workspace")
   # For systematics:
   parser.add_option('--doSystematics', dest='doSystematics', default=False, action="store_true", help="Include systematics calculations and add to datacard")
+  parser.add_option('--do2DFits', dest='do2DFits', default=False, action="store_true", help="Include systematics calculations and add to datacard")
   parser.add_option('--ignore-warnings', dest='ignore_warnings', default=False, action="store_true", help="Skip errors for missing systematics. Instead output warning message")
   # For submission
   parser.add_option('--batch', dest='batch', default='IC', help='Batch')
@@ -62,6 +63,7 @@ if opt.bkgScaler != 1.: options['modeOpts'] += ' --bkgScaler %.4f'%opt.bkgScaler
 if opt.skipZeroes: options['modeOpts'] += ' --skipZeroes'
 if opt.skipCOWCorr: options['modeOpts'] += ' --skipCOWCorr'
 if opt.doSystematics: options['modeOpts'] += ' --doSystematics'
+if opt.do2DFits: options['modeOpts'] += ' --do2DFits'
 if opt.ignore_warnings: options['modeOpts'] += ' --ignore-warnings'
 options['batch'] = opt.batch
 options['queue'] = opt.queue

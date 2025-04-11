@@ -22,21 +22,38 @@ def addConstantSyst(sd,_syst,options):
       sd.loc[(sd['type']=='sig'),_syst['name']] = sd[(sd['type']=='sig')].apply(lambda x: getValueFromJson(x,uval,_syst['name']), axis=1)
     else:
       # If signal and not NOTAG then set value
-      sd.loc[(sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG")), _syst['name']] = _syst['value']
+    #   sd.loc[(sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG")), _syst['name']] = _syst['value']
+      if "ttH" in _syst['name']: 
+
+          mask = (sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG"))&~(sd['proc'].str.contains('gghh'))
+      else: 
+
+          mask = (sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG"))
+      sd.loc[mask, _syst['name']] = _syst['value']
+# sd.loc[(sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG")), _syst['name']] = _syst['value']
 
   # Partial correlation
   elif _syst['correlateAcrossYears'] == -1:
     sd[_syst['name']] = '-'
     # Loop over years and set value for each year
     for year in options.years.split(","):
-      mask = (sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG"))&(sd['year']==year)
+    #   mask = (sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG"))&(sd['year']==year)
+      if "ttH" in _syst['name']: 
+          mask = (sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG"))&(sd['year']==year)&~(sd['proc'].str.contains('gghh'))
+      else:
+          mask = (sd['type']=='sig')&(~sd['cat'].str.contains("NOTAG"))&(sd['year']==year)
       sd.loc[mask,_syst['name']] = _syst['value'][year]
 
   # If not correlate across years then create separate columns for each year and fill separately
   else:
     for year in options.years.split(","):
       sd["%s_%s"%(_syst['name'],year)] = '-'
-      sd.loc[(sd['type']=='sig')&(sd['year']==year)&(~sd['cat'].str.contains("NOTAG")), "%s_%s"%(_syst['name'],year)] = _syst['value'][year]
+    #   sd.loc[(sd['type']=='sig')&(sd['year']==year)&(~sd['cat'].str.contains("NOTAG")), "%s_%s"%(_syst['name'],year)] = _syst['value'][year]
+      if "ttH" in _syst['name']: 
+          mask = (sd['type']=='sig')&(sd['year']==year)&(~sd['cat'].str.contains("NOTAG"))&(~sd['proc'].str.contains('gghh'))
+      else:
+          mask = (sd['type']=='sig')&(sd['year']==year)&(~sd['cat'].str.contains("NOTAG"))
+      sd.loc[mask, "%s_%s"%(_syst['name'],year)] = _syst['value'][year]
 
   return sd
 
@@ -67,6 +84,7 @@ def factoryType(d,s):
     ws = f.Get(inputWSName__)
     dataHistUp = "%s_%sUp01sigma"%(r.nominalDataName,s['name'])
     dataHistDown = "%s_%sDown01sigma"%(r.nominalDataName,s['name'])
+    # print(dataHistUp)
 
     # Check if syst is var (i.e. weight) in workspace
     if ws.allVars().selectByName("%s*"%(s['name'])).getSize():
@@ -120,7 +138,7 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
   # CHECK: is weight in contents: if not then add syst to systToSkip container + print(warning)
   systToSkip = []
   for s,f in _systFactoryTypes.items():
-    print("SSSSSS",s)
+    # print("SSSSSS",s)
     if f == "a_h": continue
     elif f == "a_w":
       if( "%sUp01sigma"%s not in _nominalDataContents )|( "%sDown01sigma"%s not in _nominalDataContents ):
@@ -230,7 +248,6 @@ def calcSystYields(_nominalDataName,_nominalDataContents,_inputWS,_systFactoryTy
 # EXPERIMENTAL SYSTEMATICS FACTORY:
 # d - dataFrame, systs - dict of systematics, ftype - dict of factoryTypes
 def experimentalSystFactory(d,systs,ftype,options,_removal=False):
-
   # Loop over systematics and add new column in dataFrame
   for s in systs:
     if s['type'] == 'constant': continue
