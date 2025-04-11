@@ -36,6 +36,7 @@ inputNuisanceExtMap = {'scales':'','scalesCorr':'','smears':''}
 # Signal output WS objects
 outputWSName__ = "wsig"
 outputWSObjectTitle__ = "hggpdfsmrel"
+outputWSDijetObjectTitle__ = "hjjpdfsmrel"
 output2DWSObjectTitle__ = "hhbbggpdfsmrel"
 # outputWSObjectTitle__ = "hjjpdfsmrel"
 outputWSNuisanceTitle__ = "CMS_hgg_nuisance"

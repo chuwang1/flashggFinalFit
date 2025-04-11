@@ -106,7 +106,7 @@ def procToData( _proc ):
   return _proc
 
 def dataToProc( _d ):
-  dataToProcMap = {v:k for k,v in procToDataMap.items()}
+  dataToProcMap = {v:k for k,v in procToDataMap.iteritems()}
   if _d in dataToProcMap: return dataToProcMap[_d]
   else: return _d
 

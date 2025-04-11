@@ -13,6 +13,7 @@ def get_options():
   parser = OptionParser()
   parser.add_option('--inputConfig',dest='inputConfig', default="", help='Input config: specify list of variables/systematics/analysis categories')
   parser.add_option('--inputTreeFile',dest='inputTreeFile', default="./output_0.root", help='Input tree file')
+  parser.add_option('--outputWSDir',dest='outputWSDir', default="./output_0.root", help='Outdir')
   parser.add_option('--inputMass',dest='inputMass', default="`125`", help='Input mass')
   parser.add_option('--productionMode',dest='productionMode', default="ggh", help='Production mode [ggh,vbf,wh,zh,tth,thq,ggzh,bbh]')
   parser.add_option('--year',dest='year', default="2016", help='Year')
@@ -37,7 +38,7 @@ import ROOT
 import pandas
 import numpy as np
 import uproot
-from root_numpy import array2tree
+# from root_numpy import array2tree
 
 from tools.commonTools import *
 from tools.commonObjects import *
@@ -47,6 +48,10 @@ print(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS ~~~~~~~~~~~~~~~~~~~~~~~
 def leave():
   print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HGG TREES 2 WS (END) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
   sys.exit(1)
+import pandas as pd
+import ROOT
+
+
 
 # Function to add vars to workspace
 def add_vars_to_workspace(_ws=None,_data=None,_stxsVar=None,jetmass=125,low=100,high=180):
@@ -57,7 +62,7 @@ def add_vars_to_workspace(_ws=None,_data=None,_stxsVar=None,jetmass=125,low=100,
   # Add vars specified by dataframe columns: skipping cat, stxsvar and type
   _vars = od()
   for var in _data.columns:
-    if var in ['type','cat',_stxsVar]: continue
+    if var in ['type','cat',_stxsVar,'']: continue
     if var == "CMS_hgg_mass": 
       _vars[var] = ROOT.RooRealVar(var,var,125.,100.,180.)
       _vars[var].setBins(160)
@@ -68,8 +73,8 @@ def add_vars_to_workspace(_ws=None,_data=None,_stxsVar=None,jetmass=125,low=100,
       _vars[var] = ROOT.RooRealVar(var,var,0.)
     elif var == "Dijet_mass": 
       _vars[var] = ROOT.RooRealVar(var,var,jetmass,low,high)
-      _vars[var].setBins((high-low)/5)
-      
+      print(int((high-low)/10))
+      _vars[var].setBins(int((high-low)/10))
     else:
       _vars[var] = ROOT.RooRealVar(var,var,1.,-999999,999999)
       _vars[var].setBins(1)
@@ -115,7 +120,7 @@ else:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For theory weights: create vars for each weight
 theoryWeightColumns = {}
-for ts, nWeights in theoryWeightContainers.iteritems(): theoryWeightColumns[ts] = ["%s_%g"%(ts[:-1],i) for i in range(0,nWeights)] # drop final s from container name
+for ts, nWeights in theoryWeightContainers.items(): theoryWeightColumns[ts] = ["%s_%g"%(ts[:-1],i) for i in range(0,nWeights)] # drop final s from container name
 
 # If year == 2018, add HET
 if opt.year == '2018': systematics.append("JetHEM")
@@ -136,8 +141,8 @@ if cats == 'auto':
   print("before",listOfTreeNames)
   for tn in listOfTreeNames:
     if "sigma" in tn: continue
-    elif "NOTAG" in tn: continue
-    elif "ERROR" in tn: continue
+    # elif "NOTAG" in tn: continue
+    # elif "ERROR" in tn: continue
     c = tn.split("_%s_"%sqrts__)[-1].split(";")[0]
     cats.append(c)
 print("cats",cats)
@@ -169,7 +174,7 @@ for cat in cats:
   dfs = {}
 
   # Theory weights
-  for ts, tsColumns in theoryWeightColumns.iteritems():
+  for ts, tsColumns in theoryWeightColumns.items():
     if opt.productionMode in modesToSkipTheoryWeights: 
       dfs[ts] = pandas.DataFrame(np.ones(shape=(len(t),theoryWeightContainers[ts])))
     else:
@@ -177,13 +182,22 @@ for cat in cats:
     dfs[ts].columns = tsColumns
 
   # Main variables to add to nominal RooDataSets
-  dfs['main'] = t.pandas.df(mainVars) if cat!='NOTAG' else t.pandas.df(notagVars)
+#   dfs['main'] = t.pandas.df(mainVars) if cat!='NOTAG' else t.pandas.df(notagVars)
+  mainVars_dropWildcards = []
+  for var in mainVars:
+    if "*" not in var:
+      mainVars_dropWildcards.append(var)
+
+  dfs['main'] = t.arrays(mainVars_dropWildcards, library='pd')
+  for var in mainVars:
+    if "*" in var:
+      dfs[var] = t.arrays(filter_name=var, library='pd')
 
   # Concatenate current dataframes
   df = pandas.concat(dfs.values(), axis=1)
 
   # Add STXS splitting var if splitting necessary
-  if opt.doSTXSSplitting: df[stxsVar] = t.pandas.df(stxsVar)
+  if opt.doSTXSSplitting: df[stxsVar] = t.pandas.df(stxsVar, library='pd')
 
   # For NOTAG: fix extract centralObjectWeight from theory weights if available
   if cat == 'NOTAG':
@@ -227,10 +241,10 @@ for cat in cats:
         streeName = re.sub("YEAR",opt.year,streeName)
         st = f[streeName]
         if len(st)==0: continue
-        sdf = st.pandas.df(systematicsVars)
+        sdf = t.arrays(systematicsVars, library='pd')
         sdf['type'] = "%s%s"%(s,direction)
         # Add STXS splitting var if splitting necessary
-        if opt.doSTXSSplitting: sdf[stxsVar] = st.pandas.df(stxsVar)
+        if opt.doSTXSSplitting: sdf[stxsVar] = st.pandas.df(stxsVar, library='pd')
     
         # Add column specifying category and add to systematics dataframe
         sdf['cat'] = cat
@@ -264,7 +278,8 @@ for stxsId in data[stxsVar].unique():
     elif opt.productionMode == 'thw': stxsBin = re.sub("TH","THW",stxsBin)
 
     # Define output workspace file
-    outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%stxsBin
+    outputWSDir = opt.outputWSDir	
+    # outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%stxsBin
     if not os.path.exists(outputWSDir): os.system("mkdir %s"%outputWSDir)
     outputWSFile = outputWSDir+"/"+re.sub(".root","_%s.root"%stxsBin,opt.inputTreeFile.split("/")[-1])
     print(" --> Creating output workspace for STXS bin: %s (%s)"%(stxsBin,outputWSFile))
@@ -274,11 +289,23 @@ for stxsId in data[stxsVar].unique():
     if opt.doSystematics: sdf = sdata
 
     # Define output workspace file
-    outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%dataToProc(opt.productionMode)
+    outputWSDir = opt.outputWSDir
+    # outputWSDir = "/".join(opt.inputTreeFile.split("/")[:-1])+"/ws_%s"%dataToProc(opt.productionMode)
     if not os.path.exists(outputWSDir): os.system("mkdir %s"%outputWSDir)
     outputWSFile = outputWSDir+"/"+re.sub(".root","_%s.root"%dataToProc(opt.productionMode),opt.inputTreeFile.split("/")[-1])
     print(" --> Creating output workspace: (%s)"%outputWSFile)
     
+  if len(cats) >1: 
+    print("check cat")
+    sys.exit()
+  for cat in cats:
+    treeName = "%s_%s_%s_%s"%(opt.productionMode,opt.inputMass,sqrts__,cat)
+    tree = f[treeName]
+    jet_mass = tree["Dijet_mass"].array()
+    max_mass = max(int(opt.high),(int(max(jet_mass))//10)*10+20)
+    min_mass = min((int(min(jet_mass))//10)*10-20,int(opt.low))
+    print(max_mass,min_mass)
+  if min_mass<0:min_mass=0
   # Open file and initiate workspace
   fout = ROOT.TFile(outputWSFile,"RECREATE")
   foutdir = fout.mkdir(inputWSName__.split("/")[0])
@@ -286,7 +313,7 @@ for stxsId in data[stxsVar].unique():
   ws = ROOT.RooWorkspace(inputWSName__.split("/")[1],inputWSName__.split("/")[1])
   
   # Add variables to workspace
-  varNames = add_vars_to_workspace(ws,df,stxsVar,jetmass,low,high)
+  varNames = add_vars_to_workspace(ws,df,stxsVar,jetmass,int(min_mass),int(max_mass))
 
   # Loop over cats
   for cat in cats:
@@ -295,22 +322,35 @@ for stxsId in data[stxsVar].unique():
     mask = (df['cat']==cat)
     # Convert dataframe to structured array, then to ROOT tree
     sa = df[mask].to_records()
-    t = array2tree(sa)
+    # t = array2tree(sa)
+    # t=dataframe_to_root(sa, "tree_name")
+	
 
     # Define RooDataSet
     dName = "%s_%s_%s_%s"%(opt.productionMode,opt.inputMass,sqrts__,cat)
     
     # Make argset
+    # print(varNames)
+    varNames=['CMS_hgg_mass', 'weight', 'dZ']
     aset = make_argset(ws,varNames)
+    d = ROOT.RooDataSet(dName,dName,aset,'weight') 
 
     # Convert tree to RooDataset and add to workspace
-    d = ROOT.RooDataSet(dName,dName,t,aset,'','weight')
-    getattr(ws,'import')(d)
+    # d = ROOT.RooDataSet(dName,dName,t,aset,'','weight')
+
+    # getattr(ws,'import')(d)
 
     # Delete trees and RooDataSet from heap
-    t.Delete()
-    d.Delete()
-    del sa
+    # t.Delete()
+    # d.Delete()
+    # del sa
+    for row in df[mask][varNames].to_numpy():
+      for i, val in enumerate(row):
+        aset[i].setVal(val)
+      d.add(aset,aset.getRealValue("weight"))
+
+    # Add to workspace
+    getattr(ws,'import')(d)
 
     if opt.doSystematics:
       # b) make RooDataHists for systematic variations
@@ -321,7 +361,7 @@ for stxsId in data[stxsVar].unique():
           mask = (sdf['type']=='%s%s'%(s,direction))&(sdf['cat']==cat)
           # Convert dataframe to structured array, then to ROOT tree
           sa = sdf[mask].to_records()
-          t = array2tree(sa)
+        #   t = array2tree(sa)
           
           # Define RooDataHist
           hName = "%s_%s_%s_%s_%s%s01sigma"%(opt.productionMode,opt.inputMass,sqrts__,cat,s,direction)
@@ -333,19 +373,23 @@ for stxsId in data[stxsVar].unique():
           aset = make_argset(ws,systematicsVarsDropWeight)
           
           h = ROOT.RooDataHist(hName,hName,aset)
-          for ev in t:
-            for v in systematicsVars:
-              if v == "weight": continue
-              else: ws.var(v).setVal(getattr(ev,v))
-            h.add(aset,getattr(ev,'weight'))
+        #   for ev in t:
+        #     for v in systematicsVars:
+        #       if v == "weight": continue
+        #       else: ws.var(v).setVal(getattr(ev,v))
+        #     h.add(aset,getattr(ev,'weight'))
+          for row, weight in zip(sdf[mask][systematicsVarsDropWeight].to_numpy(),sdf[mask]["weight"].to_numpy()):
+            for i, val in enumerate(row):
+              aset[i].setVal(val)
+            h.add(aset,weight)
           
           # Add to workspace
           getattr(ws,'import')(h)
 
           # Delete trees and RooDataHist
-          t.Delete()
-          h.Delete()
-          del sa
+        #   t.Delete()
+        #   h.Delete()
+        #   del sa
 
   # Write WS to file
   ws.Write()

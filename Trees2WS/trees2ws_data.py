@@ -24,7 +24,7 @@ from importlib import import_module
 
 import ROOT
 import uproot
-from root_numpy import array2tree
+# from root_numpy import array2tree
 from collections import OrderedDict as od
 
 from tools.commonTools import *
@@ -54,7 +54,7 @@ def add_vars_to_workspace(_ws=None,_dataVars=None,jetmass=125,low=100,high=180):
       _vars[var] = ROOT.RooRealVar(var,var,0.)
     elif var == "Dijet_mass":
       _vars[var] = ROOT.RooRealVar(var,var,jetmass,low,high)
-      _vars[var].setBins((high-low)/5)
+      _vars[var].setBins((high-low)/10)
     else:
       _vars[var] = ROOT.RooRealVar(var,var,1.,-999999,999999)
       _vars[var].setBins(1)
@@ -103,6 +103,17 @@ if cats == 'auto':
     c = tn.split("_%s_"%sqrts__)[-1].split(";")[0]
     cats.append(c)
 
+if len(cats) >1: 
+  print("check cat")
+  sys.exit()
+for cat in cats:
+  if inputTreeDir == '': treeName = "Data_%s_%s"%(sqrts__,cat)
+  else: treeName = "%s/Data_%s_%s"%(inputTreeDir,sqrts__,cat)
+  tree = f[treeName]
+  jet_mass = tree.array("Dijet_mass")
+  max_mass = (int(max(jet_mass))//10)*10+20
+  min_mass = (int(min(jet_mass))//10)*10-20
+  if min_mass<0:min_mass=0
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Open input ROOT file
 f = ROOT.TFile(opt.inputTreeFile)
@@ -119,7 +130,8 @@ foutdir.cd()
 ws = ROOT.RooWorkspace(inputWSName__.split("/")[1],inputWSName__.split("/")[1])
 
 # Add variables to workspace
-varNames = add_vars_to_workspace(ws,dataVars,jetmass,low,high)
+# varNames = add_vars_to_workspace(ws,dataVars,jetmass,low,high)
+varNames = add_vars_to_workspace(ws,dataVars,jetmass,min_mass,max_mass)
 
 # Make argset
 aset = make_argset(ws,varNames)
