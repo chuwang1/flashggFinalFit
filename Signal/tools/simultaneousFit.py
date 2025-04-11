@@ -19,7 +19,7 @@ pLUT['Gaussian_wdcb'] = od()
 pLUT['Gaussian_wdcb']['dm_p0'] = [0.0,-100,100]
 pLUT['Gaussian_wdcb']['dm_p1'] = [0.01,-0.01,0.01]
 pLUT['Gaussian_wdcb']['dm_p2'] = [0.01,-0.01,0.01]
-pLUT['Gaussian_wdcb']['sigma_p0'] = [10,1.0,300.]
+pLUT['Gaussian_wdcb']['sigma_p0'] = [10,1.0,1000.]
 pLUT['Gaussian_wdcb']['sigma_p1'] = [0.0,-0.1,0.1]
 pLUT['Gaussian_wdcb']['sigma_p2'] = [0.0,-0.001,0.001]
 pLUT['Frac'] = od()
@@ -137,11 +137,9 @@ def nChi2Addition(X,ssf,verbose=False):
     MHHigh=int(ssf.MHHigh)
     # chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh])
     if(ssf.xvar.GetName()=="CMS_hgg_mass"):
-        # print("chuw")
         chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose)
     else:
         if ssf.proc == "gghh" :
-            # print("chuw ====",MHLow,MHHigh)
             chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[MHLow,MHHigh])
         else:
             chi2, k  = calcChi2(ssf.xvar,ssf.Pdfs['final'],d,_verbose=verbose,fitRange=[0,1000]) ##2d
@@ -265,7 +263,6 @@ class SimultaneousFit:
         pLUT['DCB']['a2_p0'] = [0.01,1,10]
         pLUT['DCB']['sigma_p0'] = [20,0.0,1000.]
     else:
-        # print("chuw : set mass 125")
         pLUT['DCB']['dm_p0'] = [250,60,400]
         pLUT['DCB']['dmGau_p0'] = [250,60,400]
         pLUT['DCB']['n1_p0'] = [0.5,0.01,1000.]
@@ -432,7 +429,6 @@ class SimultaneousFit:
     # Loop over polynomials
     
     for k, poly in self.Polynomials.items():
-      print("chuw:",poly.GetName())
       _x, _y = [], []
       if(self.xvar.GetName()=="CMS_hgg_mass"):
         _mh = 100.
