@@ -85,7 +85,6 @@ if options['mode'] not in ['fTest','getDiagProc','calcPhotonSyst','signalFit']:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Extract list of filenames
 WSFileNames = extractWSFileNames(options['inputWSDir'])
-print("chuw",WSFileNames)
 if not WSFileNames: leave()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
